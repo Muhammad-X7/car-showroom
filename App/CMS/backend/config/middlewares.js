@@ -39,8 +39,8 @@ module.exports = [
       // Allow requests from your Next.js dev server and production domain.
       // Set FRONTEND_URL=https://iqcars.io in your backend .env for production.
       origin: [
-        'http://localhost:3000',
-        process.env.FRONTEND_URL || 'http://localhost:3000',
+        'https://car-showroom-jade.vercel.app',
+        process.env.FRONTEND_URL || 'https://car-showroom-jade.vercel.app',
       ],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
