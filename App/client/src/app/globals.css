@@ -1,0 +1,197 @@
+/* src/app/globals.css */
+
+/* ─── Google Fonts: distinctive pairing ─────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+@import "tailwindcss";
+
+/* font-display: swap → prevents FOIT on mobile (Mobile Rendering Guide §2) */
+
+/* ─── Design Tokens ──────────────────────────────────────────────── */
+:root {
+  --bg: #f5f4f0;
+  --bg-card: #ffffff;
+  --bg-subtle: #eeede9;
+  --border: #e2e0da;
+  --text: #111110;
+  --text-muted: #78766e;
+  --accent: #d4401a;
+  /* warm terracotta – memorable, brand-forward */
+  --accent-dark: #b33315;
+  --tag-bg: #111110;
+  --tag-text: #f5f4f0;
+  --green: #1a8a5a;
+  --pink: #d4185e;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius: 10px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, .08), 0 2px 6px rgba(0, 0, 0, .05);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, .12), 0 4px 12px rgba(0, 0, 0, .06);
+  --transition: 200ms cubic-bezier(.4, 0, .2, 1);
+}
+
+.dark {
+  --bg: #111110;
+  --bg-card: #1c1b19;
+  --bg-subtle: #242320;
+  --border: #2e2c28;
+  --text: #f0ede8;
+  --text-muted: #8a8880;
+  --accent: #e05530;
+  --accent-dark: #c44420;
+  --tag-bg: #f0ede8;
+  --tag-text: #111110;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── GPU-accelerated animations (Mobile Rendering Guide §3) ─────── */
+/* ONLY transform + opacity → offloaded to compositor, bypasses layout */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Card stagger animation */
+.animate-card {
+  opacity: 0;
+  /* will-change used sparingly (Mobile Rendering Guide §3) */
+  will-change: transform, opacity;
+  animation: fadeUp .45s ease-out forwards;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  transform-origin: top center;
+  animation: scaleIn .25s cubic-bezier(.175, .885, .32, 1.275) forwards;
+}
+
+/* Page transitions */
+.page-enter {
+  animation: fadeIn .3s ease-out forwards;
+}
+
+/* ─── Language item hover – GPU-only (translate, not margin/left) ── */
+.lang-item {
+  transition: background-color var(--transition), color var(--transition),
+    transform var(--transition);
+}
+
+.lang-item:hover {
+  transform: translateX(4px);
+}
+
+.lang-item.active {
+  transform: translateX(8px);
+}
+
+/* ─── Skeleton loader (Doherty Threshold §1) ─────────────────────── */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--bg-subtle) 25%,
+      var(--border) 50%,
+      var(--bg-subtle) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Focus ring ─────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Selection ──────────────────────────────────────────────────── */
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ─── Image aspect-ratio reserve (prevents CLS – Mobile Guide §4) ── */
+.img-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.img-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

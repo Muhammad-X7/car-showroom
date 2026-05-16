@@ -1,0 +1,78 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cars",
+  "info": {
+    "singularName": "car",
+    "pluralName": "cars",
+    "displayName": "Car"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "Price": {
+      "type": "float"
+    },
+    "Image": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Brand": {
+      "type": "string"
+    },
+    "Kilometers": {
+      "type": "float"
+    },
+    "Description": {
+      "type": "text"
+    },
+    "Transmission": {
+      "type": "enumeration",
+      "enum": [
+        "Automatic",
+        "Manual"
+      ]
+    },
+    "Condition": {
+      "type": "enumeration",
+      "enum": [
+        "New",
+        "Used"
+      ]
+    },
+    "Color": {
+      "type": "string"
+    },
+    "Year": {
+      "type": "integer"
+    },
+    "Trim": {
+      "type": "string"
+    },
+    "FuelType": {
+      "type": "string"
+    },
+    "EngineSize": {
+      "type": "float"
+    },
+    "Doors": {
+      "type": "integer"
+    },
+    "Cylinders": {
+      "type": "integer"
+    },
+    "importCountry": {
+      "type": "string"
+    }
+  }
+}
