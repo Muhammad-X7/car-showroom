@@ -21,11 +21,11 @@
       "type": "media",
       "multiple": true,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
+        "images"
       ]
+    },
+    "Year": {
+      "type": "integer"
     },
     "Brand": {
       "type": "string"

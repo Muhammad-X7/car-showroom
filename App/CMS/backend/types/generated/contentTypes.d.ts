@@ -438,7 +438,7 @@ export interface ApiCarCar extends Struct.CollectionTypeSchema {
     singularName: 'car';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     Brand: Schema.Attribute.String;
@@ -449,21 +449,21 @@ export interface ApiCarCar extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     Cylinders: Schema.Attribute.Integer;
     Description: Schema.Attribute.Text;
-    Doors: Schema.Attribute.Integer;
     EngineSize: Schema.Attribute.Float;
-    FuelType: Schema.Attribute.String;
-    Image: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios',
-      true
-    >;
-    importCountry: Schema.Attribute.String;
+    Fuel: Schema.Attribute.String;
+    Image: Schema.Attribute.Media<'images', true>;
+    ImportCountry: Schema.Attribute.String;
     Kilometers: Schema.Attribute.Float;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::car.car'> &
       Schema.Attribute.Private;
     Name: Schema.Attribute.String;
+    PaintParts: Schema.Attribute.String;
+    Plate: Schema.Attribute.String;
     Price: Schema.Attribute.Float;
     publishedAt: Schema.Attribute.DateTime;
+    SeatMaterial: Schema.Attribute.String;
+    SeatNumber: Schema.Attribute.Integer;
     Transmission: Schema.Attribute.Enumeration<['Automatic', 'Manual']>;
     Trim: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
