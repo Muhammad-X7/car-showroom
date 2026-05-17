@@ -36,12 +36,8 @@
     "Description": {
       "type": "text"
     },
-    "Transmission": {
-      "type": "enumeration",
-      "enum": [
-        "Automatic",
-        "Manual"
-      ]
+    "Trim": {
+      "type": "string"
     },
     "Condition": {
       "type": "enumeration",
@@ -50,28 +46,38 @@
         "Used"
       ]
     },
-    "Color": {
+    "PaintParts": {
       "type": "string"
     },
-    "Year": {
-      "type": "integer"
-    },
-    "Trim": {
+    "Fuel": {
       "type": "string"
     },
-    "FuelType": {
+    "ImportCountry": {
+      "type": "string"
+    },
+    "Plate": {
       "type": "string"
     },
     "EngineSize": {
       "type": "float"
     },
-    "Doors": {
-      "type": "integer"
-    },
     "Cylinders": {
       "type": "integer"
     },
-    "importCountry": {
+    "Transmission": {
+      "type": "enumeration",
+      "enum": [
+        "Automatic",
+        "Manual"
+      ]
+    },
+    "SeatNumber": {
+      "type": "integer"
+    },
+    "SeatMaterial": {
+      "type": "string"
+    },
+    "Color": {
       "type": "string"
     }
   }
