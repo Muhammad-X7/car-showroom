@@ -1,130 +1,22 @@
 "use client";
 // src/app/components/SearchModal.jsx
-// Mobile-only search modal — shown when the Search button in the header is tapped
+// Mobile-only search modal — shown when the Search button in the header is tapped.
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
+import { BRANDS, IRAQ_CITIES, MILEAGE_OPTIONS, PRICE_OPTIONS } from "./searchConstants";
+import { SearchIcon, XIcon } from "./Icons";
+import SearchDropdown from "./SearchDropdown";
 
-const BRANDS = [
-  { name: "Toyota", logo: "https://www.carlogos.org/car-logos/toyota-logo-2019-3700x1200.png" },
-  { name: "Mercedes", logo: "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011-1920x1080.png" },
-  { name: "Kia", logo: "https://www.carlogos.org/car-logos/kia-logo-2021-download.png" },
-  { name: "BYD", logo: "https://www.carlogos.org/car-logos/byd-logo-2023-download.png" },
-  { name: "BMW", logo: "https://www.carlogos.org/car-logos/bmw-logo-2020-download.png" },
-  { name: "Hyundai", logo: "https://www.carlogos.org/car-logos/hyundai-logo-2011-download.png" },
-  { name: "Nissan", logo: "https://www.carlogos.org/car-logos/nissan-logo-2020-download.png" },
-  { name: "Honda", logo: "https://www.carlogos.org/car-logos/honda-logo-2000-full.png" },
-  { name: "Volkswagen", logo: "https://www.carlogos.org/car-logos/volkswagen-logo-2019-download.png" },
-  { name: "Tesla", logo: "https://www.carlogos.org/car-logos/tesla-logo-2007-download.png" },
-];
-
-const MILEAGE_OPTIONS = [
-  "Under 10,000 km", "10,000 – 50,000 km", "50,000 – 100,000 km",
-  "100,000 – 150,000 km", "Over 150,000 km",
-];
-
-const PRICE_OPTIONS = [
-  "Under $5,000", "$5,000 – $15,000", "$15,000 – $30,000",
-  "$30,000 – $60,000", "Over $60,000",
-];
-
-/* ── Icons ── */
-const ChevronDown = ({ open }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className={`w-4 h-4 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-    aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
-  </svg>
-);
-
-const SearchIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className="w-4 h-4 shrink-0" aria-hidden="true">
-    <circle cx="11" cy="11" r="8" />
-    <path strokeLinecap="round" d="m21 21-4.35-4.35" />
-  </svg>
-);
-
-const XIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className="w-5 h-5" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-  </svg>
-);
-
-const ChevronRight = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className="w-5 h-5" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
-  </svg>
-);
-
-/* ── Dropdown ── */
-function Dropdown({ label, value, onChange, options, placeholder }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative w-full">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-xl
-          border border-[var(--border)] bg-[var(--bg-subtle)]
-          text-sm font-medium text-[var(--text)] transition-colors
-          hover:border-[var(--accent)]"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-      >
-        <span className={value ? "text-[var(--text)]" : "text-[var(--text-muted)]"}>
-          {value || label}
-        </span>
-        <ChevronDown open={open} />
-      </button>
-
-      {open && (
-        <div className="absolute top-full left-0 right-0 mt-1 z-[60]
-          bg-[var(--bg-card)] border border-[var(--border)] rounded-xl
-          shadow-[0_8px_32px_rgba(0,0,0,0.22)] overflow-hidden py-1 max-h-52 overflow-y-auto">
-          <button
-            onClick={() => { onChange(""); setOpen(false); }}
-            className="w-full text-left px-4 py-2.5 text-sm text-[var(--text-muted)]
-              hover:bg-[var(--bg-subtle)] transition-colors"
-          >
-            {placeholder || label}
-          </button>
-          {options.map(opt => (
-            <button
-              key={opt}
-              onClick={() => { onChange(opt); setOpen(false); }}
-              className={`w-full text-left px-4 py-2.5 text-sm transition-colors
-                ${value === opt
-                  ? "text-[var(--accent)] bg-[var(--bg-subtle)] font-semibold"
-                  : "text-[var(--text)] hover:bg-[var(--bg-subtle)]"
-                }`}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ── SearchModal ── */
+/* ── SearchModal ─────────────────────────────────────────────────── */
 export default function SearchModal({
   open,
   onClose,
   make, setMake,
   model, setModel,
   year, setYear,
+  city, setCity,
+  minMileage, setMinMileage,
+  maxMileage, setMaxMileage,
   minPrice, setMinPrice,
   maxPrice, setMaxPrice,
   transmission, setTransmission,
@@ -133,25 +25,11 @@ export default function SearchModal({
   totalCount,
   t,
 }) {
-  const brandsRef = useRef(null);
-  const [mileage, setMileage] = useState("");
-  const [priceRange, setPriceRange] = useState("");
-
   // Lock body scroll when modal is open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
-
-  const scrollBrands = () => {
-    if (brandsRef.current) {
-      brandsRef.current.scrollBy({ left: 200, behavior: "smooth" });
-    }
-  };
 
   const allYearOptions = years.length > 0
     ? years
@@ -168,11 +46,11 @@ export default function SearchModal({
       role="dialog"
       aria-label="Search cars"
     >
-      {/* Panel — stops click propagation so backdrop click closes but panel click doesn't */}
+      {/* Panel */}
       <div
         className="bg-[var(--bg-card)] rounded-t-2xl w-full max-h-[92dvh] flex flex-col
           animate-slide-up overflow-hidden"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
@@ -193,110 +71,108 @@ export default function SearchModal({
         {/* Scrollable body */}
         <div className="overflow-y-auto flex-1 px-5 py-4 flex flex-col gap-4">
 
-          {/* Brand logos */}
-          <div className="relative">
-            <div
-              ref={brandsRef}
-              className="grid gap-2"
-              style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
-            >
-              {BRANDS.map(brand => (
-                <button
-                  key={brand.name}
-                  onClick={() => setMake(make === brand.name ? "" : brand.name)}
-                  title={brand.name}
-                  className={`h-[56px] rounded-xl border-2 transition-all duration-200
-                    flex items-center justify-center p-2 bg-[var(--bg-card)]
-                    hover:border-[var(--accent)]
-                    ${make === brand.name
-                      ? "border-[var(--accent)] bg-[var(--bg-subtle)]"
-                      : "border-[var(--border)]"
-                    }`}
-                  aria-label={brand.name}
-                  aria-pressed={make === brand.name}
-                >
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="max-h-full max-w-full object-contain dark:invert"
-                    loading="lazy"
-                    onError={(e) => {
-                      e.target.style.display = "none";
-                      e.target.nextSibling.style.display = "block";
-                    }}
-                  />
-                  <span className="hidden text-[10px] font-bold text-[var(--text)]">
-                    {brand.name}
-                  </span>
-                </button>
-              ))}
-            </div>
+          {/* City picker — full-width dropdown */}
+          <SearchDropdown
+            label="City"
+            value={city}
+            onChange={setCity}
+            options={IRAQ_CITIES}
+            placeholder="All Iraq"
+            variant="mobile"
+          />
+
+          {/* Brand logos — 4-column grid */}
+          <div
+            className="grid gap-2"
+            style={{ gridTemplateColumns: "repeat(4, 1fr)" }}
+          >
+            {BRANDS.map((brand) => (
+              <button
+                key={brand.name}
+                onClick={() => setMake(make === brand.name ? "" : brand.name)}
+                title={brand.name}
+                className={`h-[56px] rounded-xl border-2 transition-all duration-200
+                  flex items-center justify-center p-2 bg-[var(--bg-card)]
+                  hover:border-[var(--accent)]
+                  ${make === brand.name
+                    ? "border-[var(--accent)] bg-[var(--bg-subtle)]"
+                    : "border-[var(--border)]"
+                  }`}
+                aria-label={brand.name}
+                aria-pressed={make === brand.name}
+              >
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  className="max-h-full max-w-full object-contain invert"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "block";
+                  }}
+                />
+                <span className="hidden text-[10px] font-bold text-[var(--text)]">
+                  {brand.name}
+                </span>
+              </button>
+            ))}
           </div>
 
-          {/* Dropdowns — 2-column grid */}
+          {/* Model + Year — 2-column grid */}
           <div className="grid grid-cols-2 gap-3">
-            <Dropdown
-              label="Model"
-              value={model}
-              onChange={setModel}
+            <SearchDropdown
+              label="Model" value={model} onChange={setModel}
               options={models.length > 0 ? models : ["Camry", "Corolla", "Land Cruiser", "Yaris"]}
-              placeholder="All Models"
+              placeholder="All Models" variant="mobile"
             />
-            <Dropdown
-              label="Year"
-              value={year}
-              onChange={setYear}
+            <SearchDropdown
+              label="Year" value={year} onChange={setYear}
               options={allYearOptions}
-              placeholder="All Years"
+              placeholder="All Years" variant="mobile"
             />
-            <Dropdown
-              label="Min Mileage"
-              value={mileage}
-              onChange={setMileage}
+          </div>
+
+          {/* Mileage — 2-column grid, separate min/max state */}
+          <div className="grid grid-cols-2 gap-3">
+            <SearchDropdown
+              label="Min Mileage" value={minMileage} onChange={setMinMileage}
               options={MILEAGE_OPTIONS}
-              placeholder="Min Mileage"
+              placeholder="Min Mileage" variant="mobile"
             />
-            <Dropdown
-              label="Max Mileage"
-              value={mileage}
-              onChange={setMileage}
+            <SearchDropdown
+              label="Max Mileage" value={maxMileage} onChange={setMaxMileage}
               options={MILEAGE_OPTIONS}
-              placeholder="Max Mileage"
+              placeholder="Max Mileage" variant="mobile"
             />
-            <Dropdown
-              label="Min Price"
-              value={priceRange}
-              onChange={setPriceRange}
+          </div>
+
+          {/* Price — 2-column grid, separate min/max state */}
+          <div className="grid grid-cols-2 gap-3">
+            <SearchDropdown
+              label="Min Price" value={minPrice} onChange={setMinPrice}
               options={PRICE_OPTIONS}
-              placeholder="Min Price"
+              placeholder="Min Price" variant="mobile"
             />
-            <Dropdown
-              label="Max Price"
-              value={priceRange}
-              onChange={setPriceRange}
+            <SearchDropdown
+              label="Max Price" value={maxPrice} onChange={setMaxPrice}
               options={PRICE_OPTIONS}
-              placeholder="Max Price"
+              placeholder="Max Price" variant="mobile"
             />
           </div>
 
           {/* Transmission */}
-          <Dropdown
-            label="Transmission"
-            value={transmission}
-            onChange={setTransmission}
+          <SearchDropdown
+            label="Transmission" value={transmission} onChange={setTransmission}
             options={transmissions}
-            placeholder="All Transmissions"
+            placeholder="All Transmissions" variant="mobile"
           />
 
           {/* Fuel Type */}
-          <Dropdown
-            label="Fuel Type"
-            value={fuelType}
-            onChange={setFuelType}
+          <SearchDropdown
+            label="Fuel Type" value={fuelType} onChange={setFuelType}
             options={fuelTypes}
-            placeholder="All Fuel Types"
+            placeholder="All Fuel Types" variant="mobile"
           />
-
         </div>
 
         {/* Footer: Show Cars button */}

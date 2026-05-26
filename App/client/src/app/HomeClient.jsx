@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import CarCard from "../Components/CarCard";
+import MobileSearchBar from "../Components/MobileSearchBar";
 import CarCardSkeleton from "../Components/CarCardSkeleton";
 import FilterBar from "../Components/FilterBar";
 import SearchModal from "../Components/SearchModal";
@@ -18,23 +19,13 @@ function unique(arr) {
 
 export default function HomeClient({ initialCars = [], initialError = null }) {
     const [lang, setLang] = useState("en");
-    const [theme, setTheme] = useState("light");
     const t = Translations[lang];
     const isRtl = lang === "ar" || lang === "ku";
-
-    useEffect(() => {
-        document.documentElement.classList.toggle("dark", theme === "dark");
-    }, [theme]);
 
     useEffect(() => {
         document.documentElement.dir = isRtl ? "rtl" : "ltr";
         document.documentElement.lang = lang;
     }, [isRtl, lang]);
-
-    const toggleTheme = useCallback(
-        () => setTheme((p) => (p === "light" ? "dark" : "light")),
-        []
-    );
 
     const cars = initialCars;
     const error = initialError;
@@ -91,8 +82,11 @@ export default function HomeClient({ initialCars = [], initialError = null }) {
             className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-300"
         >
             <div className="max-w-6xl mx-auto w-full min-h-screen flex flex-col bg-[var(--bg)] border-x border-[var(--border)]">
-                <Header lang={lang} setLang={setLang} theme={theme} toggleTheme={toggleTheme} t={t} onSearchOpen={() => setSearchModalOpen(true)} />
-
+                <Header lang={lang} setLang={setLang} t={t} onSearchOpen={() => setSearchModalOpen(true)} />
+                <MobileSearchBar
+                    onSearchOpen={() => setSearchModalOpen(true)}
+                    totalCount={filtered.length}
+                />
                 <SearchModal
                     open={searchModalOpen} onClose={() => setSearchModalOpen(false)}
                     make={make} setMake={setMake}

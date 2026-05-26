@@ -1,6 +1,6 @@
 "use client";
 // src/app/components/Header.jsx
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 const LANGS = [
@@ -18,50 +18,12 @@ const GlobeIcon = () => (
     </svg>
 );
 
-const MoonIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-        className="w-4 h-4" aria-hidden="true">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-);
+function Header({ lang, setLang, t }) {
+    // ↑ NOTE: onSearchOpen is intentionally removed from props here.
+    // The Search button has been moved to MobileSearchBar.jsx (below the header).
 
-const SunIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-        className="w-4 h-4" aria-hidden="true">
-        <circle cx="12" cy="12" r="5" />
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-    </svg>
-);
-
-const PhoneIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-        className="w-4 h-4" aria-hidden="true">
-        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.91-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-);
-
-const SearchIcon = () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-        className="w-4 h-4" aria-hidden="true">
-        <circle cx="11" cy="11" r="8" />
-        <path strokeLinecap="round" d="m21 21-4.35-4.35" />
-    </svg>
-);
-
-function Header({ lang, setLang, theme, toggleTheme, t, onSearchOpen }) {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const themeButtonRef = useRef(null);
-
-    const handleThemeToggle = useCallback(() => {
-        if (!document.startViewTransition) {
-            toggleTheme();
-            return;
-        }
-        document.startViewTransition(() => {
-            toggleTheme();
-        });
-    }, [toggleTheme]);
 
     const handleOutside = useCallback((e) => {
         if (!e.target.closest("[data-lang-selector]")) setOpen(false);
@@ -94,17 +56,6 @@ function Header({ lang, setLang, theme, toggleTheme, t, onSearchOpen }) {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3">
-
-                {/* Phone — desktop only */}
-                <a
-                    href={`tel:${t.phoneNumber.replace(/\s/g, "")}`}
-                    className="hidden md:flex items-center gap-2 text-[var(--text-muted)]
-            hover:text-[var(--accent)] transition-colors text-sm font-medium"
-                    aria-label={`Call ${t.phoneNumber}`}
-                >
-                    <PhoneIcon />
-                    <span>{t.phoneNumber}</span>
-                </a>
 
                 {/* Language Selector */}
                 <div className="relative" data-lang-selector>
@@ -152,29 +103,7 @@ function Header({ lang, setLang, theme, toggleTheme, t, onSearchOpen }) {
                     )}
                 </div>
 
-                {/* Search button — mobile only */}
-                <button
-                    onClick={onSearchOpen}
-                    className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold
-            text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-subtle)]
-            transition-colors border border-[var(--border)]"
-                    aria-label="Open search"
-                >
-                    <SearchIcon />
-                    <span>Search</span>
-                </button>
-
-                {/* Theme Toggle */}
-                <button
-                    ref={themeButtonRef}
-                    onClick={handleThemeToggle}
-                    className="p-2 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)]
-            text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--border)]
-            transition-colors"
-                    aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-                >
-                    {theme === "light" ? <MoonIcon /> : <SunIcon />}
-                </button>
+                {/* ✅ Search button REMOVED from here — now lives in MobileSearchBar.jsx */}
             </div>
         </header>
     );
