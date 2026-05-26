@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #0a0a0f;
+    --bg-card: #111118;
+    --bg-card-hover: #16161f;
+    --border: #1e1e2e;
+    --border-accent: #2a2a3e;
+    --accent: #6c63ff;
+    --accent-dim: rgba(108,99,255,0.15);
+    --accent-glow: rgba(108,99,255,0.3);
+    --gold: #c9a84c;
+    --text-primary: #e8e8f0;
+    --text-secondary: #7a7a9a;
+    --text-muted: #4a4a6a;
+    --green: #3ecf8e;
+    --red: #ff6b6b;
+    --teal: #22d3ee;
+    --orange: #fb923c;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(108,99,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,99,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 48px 40px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px,4vw,48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .header-left h1 span { color: var(--accent); }
+  .header-left p { margin-top: 8px; font-size: 12px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  .header-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat-pill { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; text-align: center; }
+  .stat-pill .val { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent); display: block; }
+  .stat-pill .lbl { font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 16px 40px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+  }
+
+  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 360px; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  .search-wrap input { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px 10px 38px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary); outline: none; transition: border-color .2s; }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--text-muted); }
+
+  .filter-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-secondary); cursor: pointer; transition: all .2s; letter-spacing: .5px; white-space: nowrap; }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  .add-btn { margin-left: auto; background: var(--accent); border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .add-btn:hover { background: #7c75ff; box-shadow: 0 0 20px var(--accent-glow); }
+
+  /* ── GRID ── */
+  .grid-container { position: relative; z-index: 1; padding: 32px 40px 60px; display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 22px; }
+
+  .empty-state { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: var(--text-muted); }
+  .empty-state svg { margin: 0 auto 16px; opacity: .3; display: block; }
+  .empty-state p { font-size: 13px; letter-spacing: 1px; }
+
+  /* ── CARD ── */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: transform .25s, border-color .25s, box-shadow .25s; animation: fadeUp .4s ease both; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+  .card:hover { transform: translateY(-4px); border-color: var(--border-accent); box-shadow: 0 8px 40px rgba(0,0,0,.5), 0 0 0 1px var(--accent-glow); }
+
+  .card-bar { height: 3px; background: linear-gradient(90deg, var(--accent), #a78bfa); }
+
+  .card-header { padding: 18px 20px 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; border-bottom: 1px solid var(--border); }
+  .client-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.2; }
+  .client-location { margin-top: 4px; font-size: 11px; color: var(--text-muted); letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
+
+  .card-actions { display: flex; gap: 5px; flex-shrink: 0; }
+  .icon-btn { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .icon-btn.del:hover { border-color: var(--red); color: var(--red); background: rgba(255,107,107,.1); }
+  .icon-btn.keys-btn:hover { border-color: var(--teal); color: var(--teal); background: rgba(34,211,238,.1); }
+
+  .card-body { padding: 14px 20px; display: flex; flex-direction: column; gap: 9px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .info-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; flex-shrink: 0; }
+  .info-value { font-size: 12px; color: var(--text-secondary); text-align: right; word-break: break-all; }
+  .info-value.highlight { color: var(--gold); font-weight: 500; font-size: 13px; }
+  .info-value.link { color: var(--accent); text-decoration: none; }
+  .info-value.link:hover { text-decoration: underline; }
+
+  /* Credentials strip on card */
+  .cred-strip { padding: 10px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,.2); display: flex; gap: 6px; flex-wrap: wrap; }
+  .cred-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--bg-base); border: 1px solid var(--border-accent);
+    border-radius: 20px; padding: 3px 10px 3px 7px;
+    font-size: 10px; color: var(--text-secondary); cursor: pointer;
+    transition: all .2s; letter-spacing: .3px;
+    max-width: 100%;
+  }
+  .cred-badge:hover { border-color: var(--teal); color: var(--teal); background: rgba(34,211,238,.07); }
+  .cred-badge .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-email { background: var(--accent); }
+  .dot-cloudflare { background: var(--orange); }
+  .dot-supabase { background: var(--green); }
+  .dot-other { background: var(--gold); }
+  .dot-cpanel { background: var(--teal); }
+  .dot-godaddy { background: #00b373; }
+  .dot-namecheap { background: #de3723; }
+  .dot-custom { background: #a78bfa; }
+
+  .card-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; background: rgba(0,0,0,.15); }
+  .metric { text-align: center; }
+  .metric-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-primary); display: block; }
+  .metric-val.green { color: var(--green); }
+  .metric-val.gold { color: var(--gold); }
+  .metric-val.purple { color: var(--accent); }
+  .metric-lbl { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── MODAL BASE ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.78); backdrop-filter: blur(6px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; transform: scale(.95) translateY(10px); transition: transform .25s; }
+  .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+  .modal-header { padding: 22px 26px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-card); z-index: 2; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; }
+  .modal-close { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .modal-close:hover { border-color: var(--red); color: var(--red); background: rgba(255,107,107,.1); }
+
+  .modal-body { padding: 22px 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1/-1; }
+  .field label { font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
+  .field input, .field select { background: var(--bg-base); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-primary); outline: none; transition: border-color .2s; width: 100%; }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field input::placeholder { color: var(--text-muted); }
+  .field select option { background: #16161f; }
+
+  /* section divider inside modal */
+  .modal-section { grid-column: 1/-1; margin-top: 6px; }
+  .modal-section-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 8px 0 4px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .modal-section-title .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* password eye toggle */
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 36px; }
+  .pw-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 2px; transition: color .2s; }
+  .pw-eye:hover { color: var(--text-primary); }
+
+  /* platform credentials repeater */
+  .platforms-list { grid-column: 1/-1; display: flex; flex-direction: column; gap: 10px; }
+  .platform-row { background: var(--bg-base); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 150px 1fr 1fr auto; gap: 10px; align-items: end; }
+  .platform-row .field label { font-size: 9px; }
+  .remove-platform { width: 30px; height: 30px; flex-shrink: 0; background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; align-self: flex-end; }
+  .remove-platform:hover { border-color: var(--red); color: var(--red); background: rgba(255,107,107,.1); }
+  .add-platform-btn { grid-column: 1/-1; background: transparent; border: 1px dashed var(--border-accent); border-radius: 8px; padding: 9px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .add-platform-btn:hover { border-color: var(--teal); color: var(--teal); background: rgba(34,211,238,.06); }
+
+  .modal-footer { padding: 18px 26px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; position: sticky; bottom: 0; background: var(--bg-card); z-index: 2; }
+  .btn-cancel { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 10px 20px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-muted); cursor: pointer; transition: all .2s; }
+  .btn-cancel:hover { border-color: var(--text-muted); color: var(--text-primary); }
+  .btn-save { background: var(--accent); border: none; border-radius: 8px; padding: 10px 24px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: all .2s; }
+  .btn-save:hover { background: #7c75ff; box-shadow: 0 0 16px var(--accent-glow); }
+
+  /* ── CRED VIEWER MODAL ── */
+  .cred-modal { max-width: 480px; }
+  .cred-view-section { padding: 18px 26px; border-bottom: 1px solid var(--border); }
+  .cred-view-section:last-of-type { border-bottom: none; }
+  .cred-view-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .cred-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 9px; }
+  .cred-row:last-child { margin-bottom: 0; }
+  .cred-key { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; }
+  .cred-val { font-size: 12px; color: var(--text-secondary); text-align: right; word-break: break-all; display: flex; align-items: center; gap: 6px; }
+  .cred-val.masked { letter-spacing: 3px; color: var(--text-muted); }
+  .copy-btn { background: none; border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; font-size: 9px; color: var(--text-muted); cursor: pointer; transition: all .2s; white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
+  .copy-btn:hover { border-color: var(--green); color: var(--green); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+  .reveal-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 11px; padding: 1px 4px; transition: color .2s; }
+  .reveal-btn:hover { color: var(--text-primary); }
+
+  .platform-section { padding: 14px 26px; border-bottom: 1px solid var(--border); }
+  .platform-section:last-child { border-bottom: none; }
+  .platform-name-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  @media (max-width: 620px) {
+    header, .toolbar, .grid-container { padding-left: 16px; padding-right: 16px; }
+    .modal-body { grid-template-columns: 1fr; }
+    .field.full { grid-column: 1; }
+    .platform-row { grid-template-columns: 1fr 1fr; }
+    .platform-row .field:first-child { grid-column: 1/-1; }
+  }
+</style>
+</head>
+<body>
+
+
+
+<header>
+  <div class="header-left">
+    <h1>Client <span>Portfolio</span></h1>
+    <p>Project Tracker</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill"><span class="val" id="stat-total">0</span><span class="lbl">Clients</span></div>
+    <div class="stat-pill"><span class="val" id="stat-hours">0</span><span class="lbl">Hours</span></div>
+    <div class="stat-pill"><span class="val" id="stat-revenue">$0</span><span class="lbl">Revenue</span></div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search clients, countries…">
+  </div>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="recent">Recent</button>
+  <button class="filter-btn" data-filter="high-value">High Value</button>
+  <button class="add-btn" id="openAddModal">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+    Add Client
+  </button>
+</div>
+
+<div class="grid-container" id="cardsGrid">
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+    <p>NO CLIENTS FOUND</p>
+  </div>
+</div>
+
+<!-- ── ADD / EDIT MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">New Client</span>
+      <button class="modal-close" id="closeModal">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Basic info -->
+      <div class="modal-section full"><div class="modal-section-title"><span class="dot" style="background:var(--accent)"></span>Project Info</div></div>
+
+      <div class="field full">
+        <label>Client Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Ahmed Al-Rashid">
+      </div>
+      <div class="field">
+        <label>Governorate</label>
+        <input type="text" id="f-gov" placeholder="e.g. Baghdad">
+      </div>
+      <div class="field">
+        <label>Country *</label>
+        <input type="text" id="f-country" placeholder="e.g. Iraq">
+      </div>
+      <div class="field">
+        <label>Price (USD) *</label>
+        <input type="number" id="f-price" placeholder="e.g. 500">
+      </div>
+      <div class="field">
+        <label>Website Name / Domain</label>
+        <input type="text" id="f-site" placeholder="e.g. mystore.com">
+      </div>
+      <div class="field">
+        <label>Work Start Date</label>
+        <input type="date" id="f-start">
+      </div>
+      <div class="field">
+        <label>Delivery Date</label>
+        <input type="date" id="f-delivery">
+      </div>
+      <div class="field">
+        <label>Hours Worked</label>
+        <input type="number" id="f-hours" placeholder="e.g. 40">
+      </div>
+      <div class="field">
+        <label>Days Taken</label>
+        <input type="number" id="f-days" placeholder="e.g. 14">
+      </div>
+
+      <!-- Email account -->
+      <div class="modal-section full"><div class="modal-section-title"><span class="dot dot-email"></span>Email Account</div></div>
+
+      <div class="field full">
+        <label>Email Address</label>
+        <input type="email" id="f-email" placeholder="e.g. client@gmail.com">
+      </div>
+      <div class="field">
+        <label>Email Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="f-emailpw" placeholder="Password">
+          <button type="button" class="pw-eye" data-target="f-emailpw">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Recovery Email / Phone</label>
+        <input type="text" id="f-emailrec" placeholder="e.g. backup@email.com">
+      </div>
+      <div class="field full">
+        <label>Notes (2FA, provider, etc.)</label>
+        <input type="text" id="f-emailnote" placeholder="e.g. Gmail, 2FA enabled, code in phone">
+      </div>
+
+      <!-- Platform credentials -->
+      <div class="modal-section full"><div class="modal-section-title"><span class="dot dot-cloudflare"></span>Platform Credentials</div></div>
+
+      <div class="platforms-list full" id="platformsList"></div>
+      <button type="button" class="add-platform-btn full" id="addPlatformBtn">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Add Platform
+      </button>
+
+    </div><!-- /modal-body -->
+    <div class="modal-footer">
+      <button class="btn-cancel" id="cancelModal">Cancel</button>
+      <button class="btn-save" id="saveClient">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CREDENTIALS VIEWER MODAL ── -->
+<div class="modal-overlay" id="credOverlay">
+  <div class="modal cred-modal">
+    <div class="modal-header">
+      <span class="modal-title" id="credModalTitle">🔐 Credentials</span>
+      <button class="modal-close" id="closeCredModal">✕</button>
+    </div>
+    <div id="credModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="closeCredModal2">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── PLATFORM CONFIG ──────────────────────────────────────
+const PLATFORMS = [
+  { value: 'Cloudflare', label: 'Cloudflare',  dotClass: 'dot-cloudflare' },
+  { value: 'Supabase',   label: 'Supabase',    dotClass: 'dot-supabase' },
+  { value: 'GitHub',     label: 'GitHub',      dotClass: 'dot-cpanel' },
+  { value: 'other',      label: 'Other',       dotClass: 'dot-custom' },
+];
+
+function platformMeta(val) {
+  return PLATFORMS.find(p => p.value === val) || { label: val, dotClass: 'dot-custom' };
+}
+
+// ── DATA ─────────────────────────────────────────────────
+const STORAGE_KEY = 'client_portfolio_v2';
+let clients = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let editingId = null;
+let activeFilter = 'all';
+
+
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(clients)); }
+function fmtDate(d) { if (!d) return '—'; const [y,m,day] = d.split('-'); return `${day}/${m}/${y}`; }
+function fmtPrice(p) { return p ? '$' + Number(p).toLocaleString() : '—'; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function mask(s) { if (!s) return '—'; return '•'.repeat(Math.min(s.length, 10)); }
+
+// ── RENDER ───────────────────────────────────────────────
+function filtered() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return clients.filter(c => {
+    const match = !q || [c.name, c.country, c.gov, c.site, c.email].some(v => v && v.toLowerCase().includes(q));
+    if (!match) return false;
+    if (activeFilter === 'recent') { const diff = (Date.now() - new Date(c.start||'').getTime())/(86400000); return diff<=90; }
+    if (activeFilter === 'high-value') return Number(c.price) >= 1000;
+    return true;
+  });
+}
+
+function render() {
+  const grid = document.getElementById('cardsGrid');
+  const list = filtered();
+  document.getElementById('stat-total').textContent = clients.length;
+  document.getElementById('stat-hours').textContent = clients.reduce((a,c)=>a+(Number(c.hours)||0),0);
+  const rev = clients.reduce((a,c)=>a+(Number(c.price)||0),0);
+  document.getElementById('stat-revenue').textContent = '$'+rev.toLocaleString();
+  grid.querySelectorAll('.card').forEach(el=>el.remove());
+  const empty = document.getElementById('emptyState');
+  if (list.length === 0) { empty.style.display=''; return; }
+  empty.style.display='none';
+
+  list.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = (i*0.04)+'s';
+
+    // Build cred badges
+    const badges = [];
+    if (c.email) badges.push(`<span class="cred-badge" data-cred-id="${c.id}"><span class="dot dot-email"></span>${esc(c.email)}</span>`);
+    (c.platforms||[]).forEach(p => {
+      const m = platformMeta(p.platform);
+      badges.push(`<span class="cred-badge" data-cred-id="${c.id}"><span class="dot ${m.dotClass}"></span>${esc(m.label)}: ${esc(p.user||'')}</span>`);
+    });
+
+    card.innerHTML = `
+      <div class="card-bar"></div>
+      <div class="card-header">
+        <div>
+          <div class="client-name">${esc(c.name)}</div>
+          <div class="client-location">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            ${esc(c.gov||'')}${c.gov&&c.country?', ':''}${esc(c.country||'')}
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn keys-btn" title="View Credentials" data-id="${c.id}">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </button>
+          <button class="icon-btn edit-btn" title="Edit" data-id="${c.id}">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+          </button>
+          <button class="icon-btn del del-btn" title="Delete" data-id="${c.id}">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="info-row"><span class="info-label">Website</span><span class="info-value">${c.site?`<a class="info-value link" href="https://${c.site}" target="_blank">${esc(c.site)}</a>`:'—'}</span></div>
+        <div class="info-row"><span class="info-label">Price</span><span class="info-value highlight">${fmtPrice(c.price)}</span></div>
+        <div class="info-row"><span class="info-label">Start Date</span><span class="info-value">${fmtDate(c.start)}</span></div>
+        <div class="info-row"><span class="info-label">Delivery</span><span class="info-value">${fmtDate(c.delivery)}</span></div>
+      </div>
+      ${badges.length ? `<div class="cred-strip">${badges.join('')}</div>` : ''}
+      <div class="card-footer">
+        <div class="metric"><span class="metric-val purple">${c.hours||'—'}</span><span class="metric-lbl">Hours</span></div>
+        <div class="metric"><span class="metric-val gold">${c.days||'—'}</span><span class="metric-lbl">Days</span></div>
+        <div class="metric"><span class="metric-val green">${c.price?fmtPrice(c.price):'—'}</span><span class="metric-lbl">Value</span></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', ()=>openEdit(b.dataset.id)));
+  grid.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', ()=>deleteClient(b.dataset.id)));
+  grid.querySelectorAll('.keys-btn').forEach(b => b.addEventListener('click', ()=>openCredViewer(b.dataset.id)));
+  grid.querySelectorAll('.cred-badge').forEach(b => b.addEventListener('click', ()=>openCredViewer(b.dataset.credId)));
+}
+
+// ── CREDENTIALS VIEWER ───────────────────────────────────
+const revealedPws = new Set();
+
+function openCredViewer(id) {
+  const c = clients.find(x=>x.id===id);
+  if (!c) return;
+  revealedPws.clear();
+  document.getElementById('credModalTitle').textContent = '🔐 ' + c.name;
+  const body = document.getElementById('credModalBody');
+  let html = '';
+
+  // Email section
+  if (c.email || c.emailpw) {
+    html += `<div class="cred-view-section">
+      <div class="cred-view-title"><span class="dot dot-email" style="width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Email Account</div>`;
+    if (c.email) html += credRow('Email', c.email, `email-${id}`);
+    if (c.emailpw) html += credRow('Password', c.emailpw, `emailpw-${id}`, true);
+    if (c.emailrec) html += credRow('Recovery', c.emailrec, `emailrec-${id}`);
+    if (c.emailnote) html += credRow('Notes', c.emailnote, `emailnote-${id}`);
+    html += `</div>`;
+  }
+
+  // Platforms
+  (c.platforms||[]).forEach((p, pi) => {
+    const m = platformMeta(p.platform);
+    html += `<div class="platform-section">
+      <div class="platform-name-badge">
+        <span class="dot ${m.dotClass}" style="width:8px;height:8px;border-radius:50%;display:inline-block;"></span>
+        ${esc(m.label)}${p.platform==='other'&&p.customName?' — '+esc(p.customName):''}
+      </div>`;
+    if (p.user) html += credRow('Username / Email', p.user, `pu-${id}-${pi}`);
+    if (p.password) html += credRow('Password', p.password, `pp-${id}-${pi}`, true);
+    if (p.note) html += credRow('Notes', p.note, `pn-${id}-${pi}`);
+    html += `</div>`;
+  });
+
+  if (!c.email && !(c.platforms||[]).length) {
+    html = `<div style="padding:40px 26px;text-align:center;color:var(--text-muted);font-size:13px;">No credentials saved for this client.</div>`;
+  }
+
+  body.innerHTML = html;
+  // Bind reveal + copy in viewer
+  body.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const valEl = document.getElementById('cv-'+key);
+      if (!valEl) return;
+      if (revealedPws.has(key)) {
+        revealedPws.delete(key);
+        valEl.textContent = '••••••••••';
+        valEl.classList.add('masked');
+        btn.textContent = '👁';
+      } else {
+        revealedPws.add(key);
+        valEl.textContent = btn.dataset.real;
+        valEl.classList.remove('masked');
+        btn.textContent = '🙈';
+      }
+    });
+  });
+  body.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(btn.dataset.val).then(() => {
+        btn.textContent = 'Copied!'; btn.classList.add('copied');
+        setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+
+  document.getElementById('credOverlay').classList.add('open');
+}
+
+function credRow(label, val, key, isPassword=false) {
+  const display = isPassword ? `<span id="cv-${key}" class="masked">••••••••••</span>` : `<span id="cv-${key}">${esc(val)}</span>`;
+  const eyeBtn = isPassword ? `<button class="reveal-btn" data-key="${key}" data-real="${esc(val)}" title="Reveal">👁</button>` : '';
+  return `<div class="cred-row">
+    <span class="cred-key">${label}</span>
+    <span class="cred-val">${display}${eyeBtn}<button class="copy-btn" data-val="${esc(val)}">Copy</button></span>
+  </div>`;
+}
+
+document.getElementById('closeCredModal').addEventListener('click', ()=>document.getElementById('credOverlay').classList.remove('open'));
+document.getElementById('closeCredModal2').addEventListener('click', ()=>document.getElementById('credOverlay').classList.remove('open'));
+document.getElementById('credOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) document.getElementById('credOverlay').classList.remove('open'); });
+
+// ── PLATFORMS REPEATER IN FORM ────────────────────────────
+let platformRows = [];
+
+function buildPlatformOptions(selected) {
+  return PLATFORMS.map(p => `<option value="${p.value}" ${selected===p.value?'selected':''}>${p.label}</option>`).join('');
+}
+
+function renderPlatformRows() {
+  const list = document.getElementById('platformsList');
+  list.innerHTML = '';
+  platformRows.forEach((row, idx) => {
+    const div = document.createElement('div');
+    div.className = 'platform-row';
+    div.innerHTML = `
+      <div class="field">
+        <label>Platform</label>
+        <select class="pr-platform" data-idx="${idx}">${buildPlatformOptions(row.platform)}</select>
+      </div>
+      <div class="field">
+        <label>Username / Email</label>
+        <input type="text" class="pr-user" data-idx="${idx}" value="${esc(row.user||'')}" placeholder="login@email.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" class="pr-pw" data-idx="${idx}" value="${esc(row.password||'')}" placeholder="Password">
+          <button type="button" class="pw-eye" data-target-class="pr-pw" data-idx="${idx}">👁</button>
+        </div>
+      </div>
+      <button type="button" class="remove-platform" data-idx="${idx}" title="Remove">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    `;
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll('.pr-platform').forEach(el => el.addEventListener('change', e => { platformRows[+e.target.dataset.idx].platform = e.target.value; }));
+  list.querySelectorAll('.pr-user').forEach(el => el.addEventListener('input', e => { platformRows[+e.target.dataset.idx].user = e.target.value; }));
+  list.querySelectorAll('.pr-pw').forEach(el => el.addEventListener('input', e => { platformRows[+e.target.dataset.idx].password = e.target.value; }));
+  list.querySelectorAll('.remove-platform').forEach(el => el.addEventListener('click', e => {
+    platformRows.splice(+e.currentTarget.dataset.idx, 1);
+    renderPlatformRows();
+  }));
+  list.querySelectorAll('.pw-eye[data-target-class]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.dataset.idx;
+      const inp = list.querySelector(`.pr-pw[data-idx="${idx}"]`);
+      if (inp) { inp.type = inp.type==='password'?'text':'password'; }
+    });
+  });
+}
+
+document.getElementById('addPlatformBtn').addEventListener('click', () => {
+  platformRows.push({ platform: 'cloudflare', user: '', password: '' });
+  renderPlatformRows();
+});
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal(title) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+  platformRows = [];
+  ['name','gov','country','price','site','start','delivery','hours','days','email','emailpw','emailrec','emailnote'].forEach(f => {
+    const el = document.getElementById('f-'+f);
+    if (el) el.value = '';
+  });
+  renderPlatformRows();
+}
+
+function openEdit(id) {
+  const c = clients.find(x=>x.id===id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('f-name').value = c.name||'';
+  document.getElementById('f-gov').value = c.gov||'';
+  document.getElementById('f-country').value = c.country||'';
+  document.getElementById('f-price').value = c.price||'';
+  document.getElementById('f-site').value = c.site||'';
+  document.getElementById('f-start').value = c.start||'';
+  document.getElementById('f-delivery').value = c.delivery||'';
+  document.getElementById('f-hours').value = c.hours||'';
+  document.getElementById('f-days').value = c.days||'';
+  document.getElementById('f-email').value = c.email||'';
+  document.getElementById('f-emailpw').value = c.emailpw||'';
+  document.getElementById('f-emailrec').value = c.emailrec||'';
+  document.getElementById('f-emailnote').value = c.emailnote||'';
+  platformRows = JSON.parse(JSON.stringify(c.platforms||[]));
+  renderPlatformRows();
+  openModal('Edit Client');
+}
+
+function deleteClient(id) {
+  if (!confirm('Delete this client?')) return;
+  clients = clients.filter(c=>c.id!==id);
+  save(); render();
+}
+
+document.getElementById('openAddModal').addEventListener('click', ()=>{ platformRows=[]; renderPlatformRows(); openModal('New Client'); });
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('cancelModal').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) closeModal(); });
+
+document.getElementById('saveClient').addEventListener('click', () => {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Client name is required.'); return; }
+  const data = {
+    name,
+    gov:       document.getElementById('f-gov').value.trim(),
+    country:   document.getElementById('f-country').value.trim(),
+    price:     document.getElementById('f-price').value,
+    site:      document.getElementById('f-site').value.trim(),
+    start:     document.getElementById('f-start').value,
+    delivery:  document.getElementById('f-delivery').value,
+    hours:     document.getElementById('f-hours').value,
+    days:      document.getElementById('f-days').value,
+    email:     document.getElementById('f-email').value.trim(),
+    emailpw:   document.getElementById('f-emailpw').value,
+    emailrec:  document.getElementById('f-emailrec').value.trim(),
+    emailnote: document.getElementById('f-emailnote').value.trim(),
+    platforms: JSON.parse(JSON.stringify(platformRows)),
+  };
+  if (editingId) {
+    const idx = clients.findIndex(c=>c.id===editingId);
+    if (idx!==-1) clients[idx] = { ...clients[idx], ...data };
+  } else {
+    clients.unshift({ id: uid(), ...data });
+  }
+  save(); closeModal(); render();
+});
+
+// ── PASSWORD TOGGLE (modal email field) ──────────────────
+document.querySelectorAll('.pw-eye[data-target]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const inp = document.getElementById(btn.dataset.target);
+    if (inp) { inp.type = inp.type==='password'?'text':'password'; }
+  });
+});
+
+// ── FILTERS & SEARCH ─────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    render();
+  });
+});
+document.getElementById('searchInput').addEventListener('input', render);
+
+// ── INIT ─────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
