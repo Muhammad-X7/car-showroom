@@ -1,6 +1,5 @@
 import createNextIntlPlugin from "next-intl/plugin";
 
-// 1. Initialize the plugin with the path to your i18n file
 const withNextIntl = createNextIntlPlugin("./i18n.js");
 
 /** @type {import('next').NextConfig} */
@@ -24,7 +23,27 @@ const nextConfig = {
       },
     ],
   },
+
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "connect-src 'self' https://car-showroom-production-19a3.up.railway.app",
+              "img-src 'self' data: blob: https://car-showroom-production-19a3.up.railway.app https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.eu.r2.cloudflarestorage.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self'",
+            ].join("; "),
+          },
+        ],
+      },
+    ];
+  },
 };
 
-// 2. WRAP and EXPORT the config (This is the missing step)
 export default withNextIntl(nextConfig);
