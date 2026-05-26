@@ -1,31 +1,128 @@
 "use client";
 // src/app/components/FilterBar.jsx
-// Hick's Law: group controls into logical sections; limit top-level choices
-// Postel's Law: search accepts messy input (trimmed + lowercased)
-import React, { useCallback } from "react";
+import React, { useRef, useState } from "react";
+
+/* ── Brand logos ─────────────────────────────────────────────────── */
+const BRANDS = [
+  { name: "Toyota", logo: "https://www.carlogos.org/car-logos/toyota-logo-2019-3700x1200.png" },
+  { name: "Mercedes", logo: "https://www.carlogos.org/car-logos/mercedes-benz-logo-2011-1920x1080.png" },
+  { name: "Kia", logo: "https://www.carlogos.org/car-logos/kia-logo-2021-download.png" },
+  { name: "BYD", logo: "https://www.carlogos.org/car-logos/byd-logo-2023-download.png" },
+  { name: "BMW", logo: "https://www.carlogos.org/car-logos/bmw-logo-2020-download.png" },
+  { name: "Hyundai", logo: "https://www.carlogos.org/car-logos/hyundai-logo-2011-download.png" },
+  { name: "Nissan", logo: "https://www.carlogos.org/car-logos/nissan-logo-2020-download.png" },
+  { name: "Honda", logo: "https://www.carlogos.org/car-logos/honda-logo-2000-full.png" },
+  { name: "Volkswagen", logo: "https://www.carlogos.org/car-logos/volkswagen-logo-2019-download.png" },
+  { name: "Tesla", logo: "https://www.carlogos.org/car-logos/tesla-logo-2007-download.png" },
+];
+
+const IRAQ_CITIES = [
+  "Baghdad", "Erbil", "Sulaymaniyah", "Duhok", "Mosul",
+  "Basra", "Kirkuk", "Najaf", "Karbala", "Nasiriyah",
+];
+
+const MILEAGE_OPTIONS = [
+  "Under 10,000 km", "10,000 – 50,000 km", "50,000 – 100,000 km",
+  "100,000 – 150,000 km", "Over 150,000 km",
+];
+
+const PRICE_OPTIONS = [
+  "Under $5,000", "$5,000 – $15,000", "$15,000 – $30,000",
+  "$30,000 – $60,000", "Over $60,000",
+];
+
+/* ── Icons ───────────────────────────────────────────────────────── */
+const PinIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+    className="w-4 h-4 shrink-0" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+  </svg>
+);
+
+const ChevronDown = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+    className={className} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+const ChevronRight = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+    className="w-5 h-5" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+  </svg>
+);
 
 const SearchIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none
-      text-[var(--text-muted)]" aria-hidden="true">
+    className="w-4 h-4 shrink-0" aria-hidden="true">
     <circle cx="11" cy="11" r="8" />
     <path strokeLinecap="round" d="m21 21-4.35-4.35" />
   </svg>
 );
 
-const ResetIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className="w-4 h-4" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round"
-      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-  </svg>
-);
+/* ── Custom Dropdown ─────────────────────────────────────────────── */
+function Dropdown({ label, value, onChange, options, placeholder }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
-const selectCls = `w-full text-sm font-medium bg-[var(--bg-card)] text-[var(--text)]
-  border border-[var(--border)] rounded-lg px-3 py-2.5 cursor-pointer
-  focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent
-  appearance-none transition-colors hover:border-[var(--text-muted)]`;
+  React.useEffect(() => {
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
+  return (
+    <div ref={ref} className="relative flex-1 min-w-0">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full text-left px-4 py-3 flex flex-col gap-0.5 group"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+          {label}
+        </span>
+        <span className={`text-sm font-medium flex items-center justify-between gap-2 ${value ? "text-[var(--text)]" : "text-[var(--text-muted)]"}`}>
+          <span className="truncate">{value || placeholder}</span>
+          <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        </span>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1 z-50
+          bg-[var(--bg-card)] border border-[var(--border)] rounded-xl
+          shadow-[0_8px_32px_rgba(0,0,0,0.18)] overflow-hidden py-1 min-w-[180px]">
+          <button
+            onClick={() => { onChange(""); setOpen(false); }}
+            className="w-full text-left px-4 py-2.5 text-sm text-[var(--text-muted)]
+              hover:bg-[var(--bg-subtle)] transition-colors"
+          >
+            {placeholder}
+          </button>
+          {options.map(opt => (
+            <button
+              key={opt}
+              onClick={() => { onChange(opt); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                ${value === opt
+                  ? "text-[var(--accent)] bg-[var(--bg-subtle)] font-semibold"
+                  : "text-[var(--text)] hover:bg-[var(--bg-subtle)]"
+                }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Main FilterBar — desktop only (hidden on mobile) ───────────── */
 export default function FilterBar({
   t,
   searchTerm, setSearchTerm,
@@ -38,149 +135,181 @@ export default function FilterBar({
   fuelType, setFuelType,
   makes, models, years, transmissions, fuelTypes,
   onReset,
+  totalCount = 0,
 }) {
-  // Postel's Law: strip leading/trailing whitespace before storing
-  const handleSearch = useCallback((e) => {
-    setSearchTerm(e.target.value.trimStart());
-  }, [setSearchTerm]);
+  const [city, setCity] = useState("");
+  const [cityOpen, setCityOpen] = useState(false);
+  const [mileage, setMileage] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const cityRef = useRef(null);
+  const brandsRef = useRef(null);
 
-  const hasActiveFilters = searchTerm || make || model || year ||
-    minPrice || maxPrice || transmission || fuelType;
+  React.useEffect(() => {
+    function handleClick(e) {
+      if (cityRef.current && !cityRef.current.contains(e.target)) setCityOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const scrollBrands = () => {
+    if (brandsRef.current) {
+      brandsRef.current.scrollBy({ left: 300, behavior: "smooth" });
+    }
+  };
+
+  const allYearOptions = years.length > 0
+    ? years
+    : Array.from({ length: 20 }, (_, i) => String(2025 - i));
 
   return (
+    /* hidden on mobile — SearchModal handles mobile filtering */
     <section
-      className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-5
-        shadow-[var(--shadow-sm)] mb-8"
+      className="hidden md:block mb-8 bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl
+        overflow-hidden shadow-[var(--shadow-sm)]"
       aria-label="Search and filter cars"
     >
-      {/* Row 1: Search bar (Fitts' Law: large hit area, full width on mobile) */}
-      <div className="relative mb-4">
-        <SearchIcon />
-        <input
-          type="search"
-          value={searchTerm}
-          onChange={handleSearch}
-          placeholder={t.searchPlaceholder}
-          className="w-full text-sm bg-[var(--bg-card)] text-[var(--text)]
-            border border-[var(--border)] rounded-lg pl-10 pr-4 py-2.5
-            placeholder:text-[var(--text-muted)] focus:outline-none
-            focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent
-            transition-colors hover:border-[var(--text-muted)]"
-          aria-label={t.searchPlaceholder}
-        />
+      {/* ── Row 1: Location ── */}
+      <div className="flex items-center px-5 pt-4 pb-3 border-b border-[var(--border)]">
+        <div ref={cityRef} className="relative">
+          <button
+            onClick={() => setCityOpen(v => !v)}
+            className="flex items-center gap-2 text-sm font-semibold
+              text-[var(--text)] hover:text-[var(--accent)] transition-colors
+              border border-[var(--border)] rounded-lg px-3 py-2
+              bg-[var(--bg-subtle)] hover:border-[var(--accent)]"
+            aria-haspopup="listbox"
+            aria-expanded={cityOpen}
+          >
+            <PinIcon />
+            <span>Iraq{city ? ` – ${city}` : " – Select city"}</span>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${cityOpen ? "rotate-180" : ""}`} />
+          </button>
+
+          {cityOpen && (
+            <div className="absolute top-full left-0 mt-1 z-50 w-52
+              bg-[var(--bg-card)] border border-[var(--border)] rounded-xl
+              shadow-[0_8px_32px_rgba(0,0,0,0.18)] overflow-hidden py-1">
+              <button
+                onClick={() => { setCity(""); setCityOpen(false); }}
+                className="w-full text-left px-4 py-2.5 text-sm text-[var(--text-muted)]
+                  hover:bg-[var(--bg-subtle)] transition-colors"
+              >
+                All Iraq
+              </button>
+              {IRAQ_CITIES.map(c => (
+                <button
+                  key={c}
+                  onClick={() => { setCity(c); setCityOpen(false); }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                    ${city === c
+                      ? "text-[var(--accent)] bg-[var(--bg-subtle)] font-semibold"
+                      : "text-[var(--text)] hover:bg-[var(--bg-subtle)]"
+                    }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Row 2: Filter dropdowns grid — Miller's Law: 4 controls max per row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-
-        {/* Make */}
-        <div className="relative">
-          <label className="sr-only">{t.filterMake}</label>
-          <select value={make} onChange={(e) => { setMake(e.target.value); setModel(""); }}
-            className={selectCls} aria-label={t.filterMake}>
-            <option value="">{t.allMakes}</option>
-            {makes.map((m) => <option key={m} value={m}>{m}</option>)}
-          </select>
-          <ChevronDown />
+      {/* ── Row 2: Brand Logos ── */}
+      <div className="relative px-5 py-4 border-b border-[var(--border)]">
+        <div
+          ref={brandsRef}
+          className="flex items-center gap-3 overflow-x-auto scrollbar-hide scroll-smooth"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {BRANDS.map(brand => (
+            <button
+              key={brand.name}
+              onClick={() => setMake(make === brand.name ? "" : brand.name)}
+              title={brand.name}
+              className={`shrink-0 w-[88px] h-[60px] rounded-xl border-2 transition-all duration-200
+                flex items-center justify-center p-3 bg-[var(--bg-card)]
+                hover:border-[var(--accent)] hover:shadow-md
+                ${make === brand.name
+                  ? "border-[var(--accent)] shadow-md bg-[var(--bg-subtle)]"
+                  : "border-[var(--border)]"
+                }`}
+              aria-label={brand.name}
+              aria-pressed={make === brand.name}
+            >
+              <img
+                src={brand.logo}
+                alt={brand.name}
+                className="max-h-full max-w-full object-contain dark:invert"
+                loading="lazy"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.nextSibling.style.display = "block";
+                }}
+              />
+              <span className="hidden text-xs font-bold text-[var(--text)]">
+                {brand.name}
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* Model — progressive disclosure: only useful if make selected */}
-        <div className="relative">
-          <label className="sr-only">{t.filterModel}</label>
-          <select value={model} onChange={(e) => setModel(e.target.value)}
-            className={`${selectCls} ${!make ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={!make} aria-label={t.filterModel}>
-            <option value="">{t.allModels}</option>
-            {models.map((m) => <option key={m} value={m}>{m}</option>)}
-          </select>
-          <ChevronDown />
-        </div>
+        <button
+          onClick={scrollBrands}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10
+            w-9 h-9 rounded-full bg-[var(--bg-card)] border border-[var(--border)]
+            flex items-center justify-center shadow-md
+            hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors
+            text-[var(--text-muted)]"
+          aria-label="Scroll brands right"
+        >
+          <ChevronRight />
+        </button>
+      </div>
 
-        {/* Year */}
-        <div className="relative">
-          <label className="sr-only">{t.filterYear}</label>
-          <select value={year} onChange={(e) => setYear(e.target.value)}
-            className={selectCls} aria-label={t.filterYear}>
-            <option value="">{t.allYears}</option>
-            {years.map((y) => <option key={y} value={y}>{y}</option>)}
-          </select>
-          <ChevronDown />
-        </div>
+      {/* ── Row 3: Main Dropdowns + Search Button ── */}
+      <div className="flex items-stretch divide-x divide-[var(--border)]">
+        <Dropdown
+          label="Model"
+          value={model}
+          onChange={setModel}
+          options={models.length > 0 ? models : ["Camry", "Corolla", "Land Cruiser", "Yaris"]}
+          placeholder="Select"
+        />
+        <Dropdown
+          label="Year"
+          value={year}
+          onChange={setYear}
+          options={allYearOptions}
+          placeholder="Select"
+        />
+        <Dropdown
+          label="Mileage"
+          value={mileage}
+          onChange={setMileage}
+          options={MILEAGE_OPTIONS}
+          placeholder="Select"
+        />
+        <Dropdown
+          label="Price"
+          value={priceRange}
+          onChange={setPriceRange}
+          options={PRICE_OPTIONS}
+          placeholder="Select"
+        />
 
-        {/* Transmission */}
-        <div className="relative">
-          <label className="sr-only">{t.filterTransmission}</label>
-          <select value={transmission} onChange={(e) => setTransmission(e.target.value)}
-            className={selectCls} aria-label={t.filterTransmission}>
-            <option value="">{t.filterTransmission}</option>
-            {transmissions.map((tr) => <option key={tr} value={tr}>{tr}</option>)}
-          </select>
-          <ChevronDown />
-        </div>
-
-        {/* Min Price */}
-        <div>
-          <label className="sr-only">{t.filterMinPrice}</label>
-          <input
-            type="number" min="0" placeholder={t.filterMinPrice}
-            value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
-            className="w-full text-sm bg-[var(--bg-card)] text-[var(--text)]
-              border border-[var(--border)] rounded-lg px-3 py-2.5
-              placeholder:text-[var(--text-muted)] focus:outline-none
-              focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent
-              transition-colors hover:border-[var(--text-muted)]"
-            aria-label={t.filterMinPrice}
-          />
-        </div>
-
-        {/* Max Price */}
-        <div>
-          <label className="sr-only">{t.filterMaxPrice}</label>
-          <input
-            type="number" min="0" placeholder={t.filterMaxPrice}
-            value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
-            className="w-full text-sm bg-[var(--bg-card)] text-[var(--text)]
-              border border-[var(--border)] rounded-lg px-3 py-2.5
-              placeholder:text-[var(--text-muted)] focus:outline-none
-              focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent
-              transition-colors hover:border-[var(--text-muted)]"
-            aria-label={t.filterMaxPrice}
-          />
-        </div>
-
-        {/* Fuel Type */}
-        <div className="relative">
-          <label className="sr-only">{t.filterFuelType}</label>
-          <select value={fuelType} onChange={(e) => setFuelType(e.target.value)}
-            className={selectCls} aria-label={t.filterFuelType}>
-            <option value="">{t.filterFuelType}</option>
-            {fuelTypes.map((f) => <option key={f} value={f}>{f}</option>)}
-          </select>
-          <ChevronDown />
-        </div>
-
-        {/* Reset — only visible when filters are active (Occam's Razor) */}
-        {hasActiveFilters && (
+        <div className="flex items-center px-4 py-3 shrink-0">
           <button
-            onClick={onReset}
-            className="flex items-center justify-center gap-2 text-sm font-semibold
-              text-[var(--accent)] border border-[var(--accent)] rounded-lg px-3 py-2.5
-              hover:bg-[var(--accent)] hover:text-white transition-colors"
-            aria-label={t.resetFilters}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm
+              text-white hover:opacity-90 active:scale-[.98] transition-all whitespace-nowrap"
+            style={{ background: "var(--accent)" }}
+            aria-label="Show cars"
           >
-            <ResetIcon />
-            {t.resetFilters}
+            <SearchIcon />
+            Show{totalCount > 0 ? ` ${totalCount.toLocaleString()}` : ""} Cars
           </button>
-        )}
+        </div>
       </div>
     </section>
   );
 }
-
-const ChevronDown = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-    className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none
-      text-[var(--text-muted)]" aria-hidden="true">
-    <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
-  </svg>
-);

@@ -1,7 +1,5 @@
 "use client";
-// src/app/page.jsx  ← HOME PAGE (car grid + filters)
-// Place this at: src/app/page.jsx
-// The car detail page stays at: src/app/cars/[id]/page.jsx
+// src/app/page.jsx
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Header from "../Components/Header";
@@ -9,12 +7,12 @@ import Footer from "../Components/Footer";
 import CarCard from "../Components/CarCard";
 import CarCardSkeleton from "../Components/CarCardSkeleton";
 import FilterBar from "../Components/FilterBar";
+import SearchModal from "../Components/SearchModal";
 import Translations from "./Translations";
 
 const STRAPI_BASE = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 const PAGE_SIZE = 12;
 
-/* ── fetch all cars from Strapi ───────────────────────────────────── */
 async function fetchCars() {
   const res = await fetch(
     `${STRAPI_BASE}/api/cars?populate=*&pagination[pageSize]=200`,
@@ -32,22 +30,15 @@ function buildImageUrl(raw) {
 }
 
 function formatCar(car) {
-  // Strapi v5: fields are flat on car (no .attributes wrapper)
-  // documentId is the string used in API routes, car.id is numeric (admin display only)
   const a = car.attributes || car;
-
-  // Strapi v5: Image is a flat array [ { url, formats } ]
-  // Strapi v4: Image.data[0].attributes.url
-  // Use Strapi's auto-generated small format for card thumbnails (faster loading)
   const imageRaw =
-    a.Image?.data?.[0]?.attributes?.formats?.small?.url ||  // v4 small
-    a.Image?.data?.[0]?.attributes?.url ||                   // v4 full
-    a.Image?.[0]?.formats?.small?.url ||                     // v5 small ✅
-    a.Image?.[0]?.url ||                                     // v5 full
+    a.Image?.data?.[0]?.attributes?.formats?.small?.url ||
+    a.Image?.data?.[0]?.attributes?.url ||
+    a.Image?.[0]?.formats?.small?.url ||
+    a.Image?.[0]?.url ||
     null;
 
   return {
-    // Use documentId for URL routing — Strapi v5 REST API requires it for /api/cars/:id
     id: car.documentId || car.id,
     make: a.Brand || "Unknown",
     makeAr: a.BrandAr || null,
@@ -62,21 +53,18 @@ function formatCar(car) {
     priceCurrency: a.Currency || "$",
     image: buildImageUrl(imageRaw),
     transmission: a.Transmission || null,
-    fuelType: a.FuelType || null,
+    fuelType: a.Fuel || a.FuelType || null,
     location: a.Location || "Iraq",
     type: a.Type || null,
     color: a.Color || null,
   };
 }
 
-/* ── derive unique filter options ────────────────────────────────── */
 function unique(arr) {
   return [...new Set(arr.filter(Boolean))].sort();
 }
 
-/* ── Page Component ──────────────────────────────────────────────── */
 export default function HomePage() {
-  /* theme + lang */
   const [lang, setLang] = useState("en");
   const [theme, setTheme] = useState("light");
   const t = Translations[lang];
@@ -96,7 +84,6 @@ export default function HomePage() {
     []
   );
 
-  /* data */
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,7 +96,7 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* filters */
+  // Filter state — shared between FilterBar (desktop) and SearchModal (mobile)
   const [searchTerm, setSearchTerm] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -119,6 +106,9 @@ export default function HomePage() {
   const [transmission, setTransmission] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [page, setPage] = useState(1);
+
+  // Mobile search modal
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   const onReset = useCallback(() => {
     setSearchTerm("");
@@ -132,20 +122,15 @@ export default function HomePage() {
     setPage(1);
   }, []);
 
-  /* derived filter options */
   const makes = useMemo(() => unique(cars.map((c) => c.make)), [cars]);
   const models = useMemo(
     () => unique(cars.filter((c) => !make || c.make === make).map((c) => c.model)),
     [cars, make]
   );
   const years = useMemo(() => unique(cars.map((c) => c.year)), [cars]);
-  const transmissions = useMemo(
-    () => unique(cars.map((c) => c.transmission)),
-    [cars]
-  );
+  const transmissions = useMemo(() => unique(cars.map((c) => c.transmission)), [cars]);
   const fuelTypes = useMemo(() => unique(cars.map((c) => c.fuelType)), [cars]);
 
-  /* filtered results */
   const filtered = useMemo(() => {
     const q = searchTerm.toLowerCase().trim();
     return cars.filter((c) => {
@@ -161,103 +146,116 @@ export default function HomePage() {
     });
   }, [cars, searchTerm, make, model, year, minPrice, maxPrice, transmission, fuelType]);
 
-  /* pagination */
   const visible = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
   const hasMore = visible.length < filtered.length;
 
-  /* reset page when filters change */
   useEffect(() => setPage(1), [searchTerm, make, model, year, minPrice, maxPrice, transmission, fuelType]);
 
   return (
-    <div className={theme === "dark" ? "dark" : ""}>
-      <div
-        dir={isRtl ? "rtl" : "ltr"}
-        className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-300"
-      >
-        <div className="max-w-6xl mx-auto w-full min-h-screen flex flex-col bg-[var(--bg)] border-x border-[var(--border)]">
+    <div
+      dir={isRtl ? "rtl" : "ltr"}
+      className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-300"
+    >
+      <div className="max-w-6xl mx-auto w-full min-h-screen flex flex-col bg-[var(--bg)] border-x border-[var(--border)]">
 
-          <Header
-            lang={lang}
-            setLang={setLang}
-            theme={theme}
-            toggleTheme={toggleTheme}
+        <Header
+          lang={lang}
+          setLang={setLang}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          t={t}
+          onSearchOpen={() => setSearchModalOpen(true)}
+        />
+
+        {/* Mobile search modal */}
+        <SearchModal
+          open={searchModalOpen}
+          onClose={() => setSearchModalOpen(false)}
+          make={make} setMake={setMake}
+          model={model} setModel={setModel}
+          year={year} setYear={setYear}
+          minPrice={minPrice} setMinPrice={setMinPrice}
+          maxPrice={maxPrice} setMaxPrice={setMaxPrice}
+          transmission={transmission} setTransmission={setTransmission}
+          fuelType={fuelType} setFuelType={setFuelType}
+          models={models}
+          years={years}
+          transmissions={transmissions}
+          fuelTypes={fuelTypes}
+          totalCount={filtered.length}
+          t={t}
+        />
+
+        <main className="px-6 md:px-10 py-8 flex-1 flex flex-col">
+
+          {/* Desktop filter bar — hidden on mobile */}
+          <FilterBar
             t={t}
+            searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+            make={make} setMake={setMake}
+            model={model} setModel={setModel}
+            year={year} setYear={setYear}
+            minPrice={minPrice} setMinPrice={setMinPrice}
+            maxPrice={maxPrice} setMaxPrice={setMaxPrice}
+            transmission={transmission} setTransmission={setTransmission}
+            fuelType={fuelType} setFuelType={setFuelType}
+            makes={makes}
+            models={models}
+            years={years}
+            transmissions={transmissions}
+            fuelTypes={fuelTypes}
+            onReset={onReset}
+            totalCount={filtered.length}
           />
 
-          <main className="px-6 md:px-10 py-8 flex-1 flex flex-col">
+          {error && !loading && (
+            <div className="flex flex-1 items-center justify-center">
+              <p className="text-sm text-red-500">
+                Could not load cars: {error}. Is Strapi running at{" "}
+                <code className="font-mono">{STRAPI_BASE}</code>?
+              </p>
+            </div>
+          )}
 
-            <FilterBar
-              t={t}
-              searchTerm={searchTerm} setSearchTerm={setSearchTerm}
-              make={make} setMake={setMake}
-              model={model} setModel={setModel}
-              year={year} setYear={setYear}
-              minPrice={minPrice} setMinPrice={setMinPrice}
-              maxPrice={maxPrice} setMaxPrice={setMaxPrice}
-              transmission={transmission} setTransmission={setTransmission}
-              fuelType={fuelType} setFuelType={setFuelType}
-              makes={makes}
-              models={models}
-              years={years}
-              transmissions={transmissions}
-              fuelTypes={fuelTypes}
-              onReset={onReset}
-            />
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <CarCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
 
-            {/* Error state */}
-            {error && !loading && (
-              <div className="flex flex-1 items-center justify-center">
-                <p className="text-sm text-red-500">
-                  Could not load cars: {error}. Is Strapi running at{" "}
-                  <code className="font-mono">{STRAPI_BASE}</code>?
-                </p>
-              </div>
-            )}
+          {!loading && !error && filtered.length === 0 && (
+            <div className="flex flex-1 items-center justify-center text-[var(--text-muted)] text-sm">
+              {t.noResults}
+            </div>
+          )}
 
-            {/* Loading skeletons */}
-            {loading && (
+          {!loading && !error && visible.length > 0 && (
+            <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <CarCardSkeleton key={i} />
+                {visible.map((car, i) => (
+                  <CarCard key={car.id} car={car} lang={lang} index={i} t={t} />
                 ))}
               </div>
-            )}
 
-            {/* Empty state */}
-            {!loading && !error && filtered.length === 0 && (
-              <div className="flex flex-1 items-center justify-center text-[var(--text-muted)] text-sm">
-                {t.noResults}
-              </div>
-            )}
-
-            {/* Car grid */}
-            {!loading && !error && visible.length > 0 && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {visible.map((car, i) => (
-                    <CarCard key={car.id} car={car} lang={lang} index={i} t={t} />
-                  ))}
+              {hasMore && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={() => setPage((p) => p + 1)}
+                    className="px-8 py-3 rounded-xl font-bold text-sm text-white
+                      hover:opacity-90 active:scale-[.98] transition-all"
+                    style={{ background: "var(--accent)" }}
+                  >
+                    {t.loadMore}
+                  </button>
                 </div>
+              )}
+            </>
+          )}
+        </main>
 
-                {/* Load More */}
-                {hasMore && (
-                  <div className="flex justify-center mt-8">
-                    <button
-                      onClick={() => setPage((p) => p + 1)}
-                      className="px-8 py-3 rounded-xl font-bold text-sm text-white
-                        hover:opacity-90 active:scale-[.98] transition-all"
-                      style={{ background: "var(--accent)" }}
-                    >
-                      {t.loadMore}
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </main>
-
-          <Footer t={t} />
-        </div>
+        <Footer t={t} />
       </div>
     </div>
   );

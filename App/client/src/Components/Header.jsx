@@ -1,6 +1,6 @@
 "use client";
 // src/app/components/Header.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 
 const LANGS = [
@@ -40,11 +40,29 @@ const PhoneIcon = () => (
     </svg>
 );
 
-function Header({ lang, setLang, theme, toggleTheme, t }) {
+const SearchIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+        className="w-4 h-4" aria-hidden="true">
+        <circle cx="11" cy="11" r="8" />
+        <path strokeLinecap="round" d="m21 21-4.35-4.35" />
+    </svg>
+);
+
+function Header({ lang, setLang, theme, toggleTheme, t, onSearchOpen }) {
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const themeButtonRef = useRef(null);
 
-    // Close dropdown on outside click
+    const handleThemeToggle = useCallback(() => {
+        if (!document.startViewTransition) {
+            toggleTheme();
+            return;
+        }
+        document.startViewTransition(() => {
+            toggleTheme();
+        });
+    }, [toggleTheme]);
+
     const handleOutside = useCallback((e) => {
         if (!e.target.closest("[data-lang-selector]")) setOpen(false);
     }, []);
@@ -54,7 +72,6 @@ function Header({ lang, setLang, theme, toggleTheme, t }) {
         return () => document.removeEventListener("click", handleOutside);
     }, [handleOutside]);
 
-    // Subtle header shadow on scroll — native CSS position:sticky, no JS reflow
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 8);
         window.addEventListener("scroll", onScroll, { passive: true });
@@ -70,14 +87,15 @@ function Header({ lang, setLang, theme, toggleTheme, t }) {
         ${scrolled ? "shadow-md" : ""}`}
             style={{ fontFamily: "var(--font-display)" }}
         >
-            {/* ── Left: Logo (Serial Position Effect §15 — highest memory anchor) ── */}
+            {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group" aria-label="IQCars home">
                 <img src="/logo_.png" alt="IQCars Logo" className="h-10 w-auto" />
             </Link>
 
-            {/* ── Right: Actions (Serial Position Effect — secondary memory anchor) ── */}
+            {/* Right: Actions */}
             <div className="flex items-center gap-3">
-                {/* Phone — hidden on mobile to reduce Hick's Law choices */}
+
+                {/* Phone — desktop only */}
                 <a
                     href={`tel:${t.phoneNumber.replace(/\s/g, "")}`}
                     className="hidden md:flex items-center gap-2 text-[var(--text-muted)]
@@ -134,9 +152,22 @@ function Header({ lang, setLang, theme, toggleTheme, t }) {
                     )}
                 </div>
 
-                {/* Theme Toggle — Von Restorff: isolated, contrast button */}
+                {/* Search button — mobile only */}
                 <button
-                    onClick={toggleTheme}
+                    onClick={onSearchOpen}
+                    className="md:hidden flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold
+            text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-subtle)]
+            transition-colors border border-[var(--border)]"
+                    aria-label="Open search"
+                >
+                    <SearchIcon />
+                    <span>Search</span>
+                </button>
+
+                {/* Theme Toggle */}
+                <button
+                    ref={themeButtonRef}
+                    onClick={handleThemeToggle}
                     className="p-2 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)]
             text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--border)]
             transition-colors"

@@ -1,7 +1,7 @@
 "use client";
 // src/app/cars/[id]/page.jsx
 
-import { useState, useEffect, useCallback, use } from "react";
+import { useState, useEffect, useCallback, use, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Header from "../../../Components/Header";
@@ -17,13 +17,12 @@ function buildImageUrl(raw) {
 
 function formatCar(car) {
     const a = car.attributes || car;
-    // Strapi v5: Image is flat array [{ url }], v4: Image.data[].attributes.url
     const rawImgs =
-        a.Image?.data?.map((i) => i?.attributes?.url) ||   // v4
-        a.Image?.map((i) => i?.url) ||                      // v5 ✅
+        a.Image?.data?.map((i) => i?.attributes?.url) ||
+        a.Image?.map((i) => i?.url) ||
         [];
     return {
-        id: car.documentId || car.id,   // Strapi v5 routes use documentId
+        id: car.documentId || car.id,
         make: a.Brand || "Unknown",
         makeAr: a.BrandAr || null,
         makeKu: a.BrandKu || null,
@@ -45,7 +44,7 @@ function formatCar(car) {
         doors: a.Doors || null,
         condition: a.Condition || null,
         cylinders: a.Cylinders || null,
-        importCountry: a.importCountry || a.ImportCountry || null,  // Strapi v5 lowercase
+        importCountry: a.importCountry || a.ImportCountry || null,
         phone: a.Phone || "0750 999 9999",
     };
 }
@@ -117,47 +116,133 @@ const CylinderIcon = () => (
 /* ── Gallery ─────────────────────────────────────────────────────── */
 function Gallery({ images, alt }) {
     const [active, setActive] = useState(0);
-    const prev = () => setActive((i) => (i === 0 ? images.length - 1 : i - 1));
-    const next = () => setActive((i) => (i === images.length - 1 ? 0 : i + 1));
+    const touchStartX = useRef(null);
+    const touchStartY = useRef(null);
+    const isDragging = useRef(false);
+    const total = images.length;
+
+    const prev = useCallback(() => setActive((i) => (i === 0 ? total - 1 : i - 1)), [total]);
+    const next = useCallback(() => setActive((i) => (i === total - 1 ? 0 : i + 1)), [total]);
+
+    const onTouchStart = (e) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        isDragging.current = false;
+    };
+
+    const onTouchMove = (e) => {
+        if (touchStartX.current === null) return;
+        const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+        if (dx > dy && dx > 8) isDragging.current = true;
+    };
+
+    const onTouchEnd = (e) => {
+        if (touchStartX.current === null) return;
+        const dx = e.changedTouches[0].clientX - touchStartX.current;
+        if (isDragging.current && Math.abs(dx) > 40) {
+            dx < 0 ? next() : prev();
+        }
+        touchStartX.current = null;
+        touchStartY.current = null;
+        isDragging.current = false;
+    };
 
     return (
-        <div className="flex flex-col gap-2">
-            <div className="relative img-wrap rounded-xl overflow-hidden bg-[var(--bg-subtle)]"
-                style={{ aspectRatio: "16/9" }}>
-                <Image src={images[active]} alt={`${alt} ${active + 1}`}
-                    fill sizes="(max-width:768px) 100vw, 800px"
-                    className="object-cover" priority />
+        <div className="flex flex-col gap-3">
+            {/* Main image — touch-navigable, no arrows, no counter */}
+            <div
+                className="relative img-wrap rounded-xl overflow-hidden bg-[var(--bg-subtle)] select-none"
+                style={{ aspectRatio: "16/9" }}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+            >
+                {images.map((src, i) => (
+                    <div
+                        key={i}
+                        className="absolute inset-0 transition-opacity duration-300"
+                        style={{
+                            opacity: i === active ? 1 : 0,
+                            pointerEvents: i === active ? "auto" : "none",
+                        }}
+                    >
+                        <Image
+                            src={src}
+                            alt={`${alt} ${i + 1}`}
+                            fill
+                            sizes="(max-width:768px) 100vw, 800px"
+                            className="object-cover"
+                            priority={i === 0}
+                            loading={i === 0 ? "eager" : "lazy"}
+                        />
+                    </div>
+                ))}
 
-                {images.length > 1 && (
+                {/* Arrows — desktop only */}
+                {total > 1 && (
                     <>
                         <button onClick={prev} aria-label="Previous photo"
-                            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
-                bg-black/40 hover:bg-black/60 flex items-center justify-center
-                text-white backdrop-blur-sm transition-colors">
+                            className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
+                                bg-black/40 hover:bg-black/60 items-center justify-center
+                                text-white backdrop-blur-sm transition-colors">
                             <ChevronLeft />
                         </button>
                         <button onClick={next} aria-label="Next photo"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
-                bg-black/40 hover:bg-black/60 flex items-center justify-center
-                text-white backdrop-blur-sm transition-colors">
+                            className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
+                                bg-black/40 hover:bg-black/60 items-center justify-center
+                                text-white backdrop-blur-sm transition-colors">
                             <ChevronRight />
                         </button>
                     </>
                 )}
-
-                <span className="absolute bottom-3 right-3 text-xs font-semibold
-          bg-black/50 text-white px-2.5 py-1 rounded-full backdrop-blur-sm">
-                    {active + 1} / {images.length}
-                </span>
             </div>
 
-            {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1">
+            {/* Segmented progress bar — mobile only */}
+            {total > 1 && (
+                <div
+                    className="flex gap-1.5 md:hidden"
+                    role="tablist"
+                    aria-label={`Photo ${active + 1} of ${total}`}
+                >
+                    {images.map((_, i) => (
+                        <button
+                            key={i}
+                            role="tab"
+                            aria-selected={i === active}
+                            aria-label={`Go to photo ${i + 1}`}
+                            onClick={() => setActive(i)}
+                            className="relative h-[3px] flex-1 rounded-full overflow-hidden bg-[var(--border)]"
+                        >
+                            <span
+                                className="absolute inset-y-0 left-0 rounded-full"
+                                style={{
+                                    width: i <= active ? "100%" : "0%",
+                                    background: i <= active ? "var(--accent)" : "transparent",
+                                    transition: i === active
+                                        ? "width 0.35s ease-out"
+                                        : i < active
+                                            ? "none"
+                                            : "width 0.2s ease-in",
+                                }}
+                            />
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* Thumbnails — desktop only */}
+            {total > 1 && (
+                <div className="hidden md:flex gap-2 overflow-x-auto pb-1">
                     {images.map((src, i) => (
-                        <button key={i} onClick={() => setActive(i)}
+                        <button
+                            key={i}
+                            onClick={() => setActive(i)}
                             className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all
-                ${i === active ? "border-[var(--accent)]" : "border-transparent opacity-60 hover:opacity-90"}`}
-                            style={{ width: 88, height: 60 }} aria-label={`Photo ${i + 1}`}>
+                                ${i === active ? "border-[var(--accent)]" : "border-transparent opacity-60 hover:opacity-90"}`}
+                            style={{ width: 88, height: 60 }}
+                            aria-label={`Photo ${i + 1}`}
+                        >
                             <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" />
                         </button>
                     ))}
@@ -198,11 +283,6 @@ function Skeleton() {
     return (
         <div className="flex flex-col gap-4 max-w-3xl">
             <div className="skeleton rounded-xl" style={{ aspectRatio: "16/9" }} />
-            <div className="flex gap-2">
-                {[...Array(5)].map((_, i) => (
-                    <div key={i} className="skeleton rounded-lg" style={{ width: 88, height: 60 }} />
-                ))}
-            </div>
             <div className="skeleton h-8 rounded-lg w-1/2 mt-2" />
             <div className="skeleton h-5 rounded w-1/3" />
             <div className="skeleton h-20 rounded-xl" />
@@ -354,7 +434,7 @@ export default function CarDetailPage({ params }) {
                                     </a>
                                 </div>
 
-                                {/* Full spec table — only fields that exist in Strapi */}
+                                {/* Full spec table */}
                                 <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl px-5 py-1">
                                     <h2 className="text-xs font-bold uppercase tracking-widest
                     text-[var(--text-muted)] py-4 border-b border-[var(--border)]">

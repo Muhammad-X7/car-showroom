@@ -4,12 +4,44 @@ import React from "react";
 import Link from "next/link";
 
 const SOCIALS = [
-    { name: "Facebook", href: "#", src: "https://iqcars-assets.iqcars.io/images/platforms/facebook.svg" },
-    { name: "Instagram", href: "#", src: "https://iqcars-assets.iqcars.io/images/platforms/instagram.svg" },
-    { name: "TikTok", href: "#", src: "https://iqcars-assets.iqcars.io/images/platforms/tiktok.svg" },
-    { name: "X", href: "#", src: "https://iqcars-assets.iqcars.io/images/platforms/x.svg" },
-    { name: "Threads", href: "#", src: "https://iqcars-assets.iqcars.io/images/platforms/threads.svg" },
-    { name: "LinkedIn", href: "#", src: "https://iqcars-assets.iqcars.io/images/platforms/linkedin.svg" },
+    {
+        name: "Facebook",
+        href: "#",
+        icon: (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+        ),
+    },
+    {
+        name: "Instagram",
+        href: "#",
+        icon: (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-6 h-6">
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
+        ),
+    },
+    {
+        name: "TikTok",
+        href: "#",
+        icon: (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
+            </svg>
+        ),
+    },
+    {
+        name: "X",
+        href: "#",
+        icon: (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.733-8.835L1.254 2.25H8.08l4.259 5.631 5.905-5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+        ),
+    },
 ];
 
 const PinIcon = () => (
@@ -94,14 +126,7 @@ function Footer({ t }) {
                                 aria-label={s.name}
                                 className="opacity-80 hover:opacity-100 transition-opacity"
                             >
-                                <img
-                                    src={s.src}
-                                    alt={s.name}
-                                    width={24}
-                                    height={24}
-                                    className="dark:invert"
-                                    loading="lazy"
-                                />
+                                {s.icon}
                             </a>
                         ))}
                     </div>
