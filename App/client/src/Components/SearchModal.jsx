@@ -92,7 +92,7 @@ export default function SearchModal({
                 onClick={() => setMake(make === brand.name ? "" : brand.name)}
                 title={brand.name}
                 className={`h-[56px] rounded-xl border-2 transition-all duration-200
-                  flex items-center justify-center p-2 bg-[var(--bg-card)]
+                  flex items-center justify-center p-2 bg-[#aba9a9c3]
                   hover:border-[var(--accent)]
                   ${make === brand.name
                     ? "border-[var(--accent)] bg-[var(--bg-subtle)]"

@@ -30,7 +30,7 @@ function BrandStrip({ make, setMake }) {
             onClick={() => setMake(make === brand.name ? "" : brand.name)}
             title={brand.name}
             className={`shrink-0 w-[88px] h-[60px] rounded-xl border-2 transition-all duration-200
-              flex items-center justify-center p-3 bg-[var(--bg-card)]
+              flex items-center justify-center p-3 bg-[#aba9a9c3]
               hover:border-[var(--accent)] hover:shadow-md
               ${make === brand.name
                 ? "border-[var(--accent)] shadow-md bg-[var(--bg-subtle)]"
