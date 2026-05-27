@@ -104,7 +104,7 @@ export default function SearchModal({
                 <img
                   src={brand.logo}
                   alt={brand.name}
-                  className="max-h-full max-w-full object-contain invert"
+                  className="max-h-full max-w-full object-contain"
                   loading="lazy"
                   onError={(e) => {
                     e.target.style.display = "none";

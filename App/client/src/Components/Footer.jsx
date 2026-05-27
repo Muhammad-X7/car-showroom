@@ -81,7 +81,7 @@ function Footer({ t }) {
                 {/* Brand column */}
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-2">
-                        <img src="/logo_.png" alt="IQCars Logo" className="h-10 w-auto" />
+                        <img src="/logo.png" alt="IQCars Logo" className="h-10 w-auto" />
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed max-w-xs">
                         Iraq's premier car listing platform. Find your perfect vehicle from
