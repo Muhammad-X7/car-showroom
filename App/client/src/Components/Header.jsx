@@ -51,7 +51,7 @@ function Header({ lang, setLang, t }) {
         >
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group" aria-label="IQCars home">
-                <img src="/logo_.png" alt="IQCars Logo" className="h-10 w-auto" />
+                <img src="/logo.png" alt="Logo" className="w-20" />
             </Link>
 
             {/* Right: Actions */}

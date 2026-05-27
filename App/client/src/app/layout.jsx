@@ -6,6 +6,11 @@ export const metadata = {
     default: "IQCars – Find Your Perfect Car in Iraq",
     template: "%s | IQCars",
   },
+  icons: {
+    icon: "/favicon_io/favicon.ico",
+    shortcut: "/favicon_io/favicon-16x16.png",
+    apple: "/favicon_io/apple-touch-icon.png",
+  },
   description:
     "Browse thousands of new and used cars for sale in Iraq. Filter by make, model, year and price. Available in English, Arabic, and Kurdish.",
   keywords: ["cars Iraq", "used cars", "new cars", "سيارات العراق", "ئۆتۆمبێل عێراق"],
