@@ -337,7 +337,7 @@ export default function CarDetailClient({ car }) {
                             <SpecRow label={t("transmissionLabel")} value={car.transmission} />
                             <SpecRow label={t("fuelLabel")} value={car.fuelType} />
                             <SpecRow label="Trim" value={car.trim} />
-                            <SpecRow label="Color" value={car.color} isColor />
+                            <SpecRow label="Color" value={car.color} />
                             <SpecRow label="Condition" value={car.condition} />
                             <SpecRow label="Engine Size" value={car.engineSize} />
                             <SpecRow label="Cylinders" value={car.cylinders} />

@@ -8,7 +8,7 @@ function buildImageUrl(raw) {
   return `${BASE}${raw}`;
 }
 
-function formatCar(car, locale = "en") {
+function formatCar(car) {
   const a = car.attributes || car;
 
   const imageRaw =
@@ -23,24 +23,15 @@ function formatCar(car, locale = "en") {
     a.Image?.slice(1)?.map((i) => i?.url) ||
     [];
 
-  // Localized brand name fallback chain
-  const brandByLocale = {
-    ar: a.BrandAr || a.Brand || "غير معروف",
-    ckb: a.BrandKu || a.Brand || "نەزانراو",
-    en: a.Brand || "Unknown",
-  };
-
-  // Localized model name fallback chain
-  const nameByLocale = {
-    ar: a.NameAr || a.Name || "غير معروف",
-    ckb: a.NameKu || a.Name || "نەزانراو",
-    en: a.Name || "Unknown",
-  };
+  // Brand and Trim are shared across all locales (not localized)
+  // Name and Description are localized per language
+  const brand = a.Brand || "Unknown";
+  const name  = a.Name  || "Unknown";
 
   return {
     id: car.documentId || car.id,
-    make: brandByLocale[locale] ?? brandByLocale.en,
-    model: nameByLocale[locale] ?? nameByLocale.en,
+    make: brand,
+    model: name,
     year: a.Year ? String(a.Year) : null,
     odometer: a.Kilometers
       ? `${Number(a.Kilometers).toLocaleString()} km`
@@ -53,12 +44,11 @@ function formatCar(car, locale = "en") {
     trim: a.Trim || null,
     transmission: a.Transmission || null,
     fuelType: a.Fuel || null,
-    location: a.ImportCountry || "Iraq",   // ImportCountry is the real location field
+    location: a.ImportCountry || "Iraq",
     type: a.Type || null,
     description: a.Description || null,
     color: a.Color || null,
     engineSize: a.EngineSize ? String(a.EngineSize) : null,
-    // ── fields that were missing from the return object ──────────────
     cylinders: a.Cylinders ? String(a.Cylinders) : null,
     condition: a.Condition || null,
     paintParts: a.PaintParts || null,
@@ -66,7 +56,6 @@ function formatCar(car, locale = "en") {
     plate: a.Plate || null,
     seatNumber: a.SeatNumber ? String(a.SeatNumber) : null,
     seatMaterial: a.SeatMaterial || null,
-    // ── kept for forward-compat if added to schema later ─────────────
     doors: a.Doors ? String(a.Doors) : null,
     phone: a.Phone || null,
     slug: a.slug || String(car.documentId || car.id),
@@ -81,7 +70,7 @@ export async function fetchCars(locale = "ar") {
     );
     if (!res.ok) throw new Error(`Strapi error: ${res.status}`);
     const json = await res.json();
-    return (json.data || []).map((car) => formatCar(car, locale));
+    return (json.data || []).map((car) => formatCar(car));
   } catch (err) {
     console.error("fetchCars failed:", err);
     return [];
@@ -96,7 +85,7 @@ export async function fetchCarById(id, locale = "ar") {
     );
     if (!res.ok) throw new Error(`Strapi error: ${res.status}`);
     const json = await res.json();
-    return json.data ? formatCar(json.data, locale) : null;
+    return json.data ? formatCar(json.data) : null;
   } catch (err) {
     console.error("fetchCarById failed:", err);
     return null;
