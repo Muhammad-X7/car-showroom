@@ -1,15 +1,12 @@
+// proxy.js (project root)
 import createMiddleware from "next-intl/middleware";
-import { defineRouting } from "next-intl/routing";
-import { locales, defaultLocale } from "./i18n";
+import { routing } from "./src/i18n/routing";
 
-const routing = defineRouting({
-  locales,
-  defaultLocale,
-  localePrefix: "always",
-  localeDetection: false,
-});
+const intlMiddleware = createMiddleware(routing);
 
-export default createMiddleware(routing);
+export function proxy(req) {
+  return intlMiddleware(req);
+}
 
 export const config = {
   matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",

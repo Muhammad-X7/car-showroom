@@ -1,19 +1,22 @@
 // src/app/[locale]/layout.jsx
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { locales } from "@/i18n";
 
+const LOCALES = ["ar", "en", "ckb"];
 const RTL_LOCALES = ["ar", "ckb"];
 
 export async function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
+  return LOCALES.map((locale) => ({ locale }));
 }
 
 export default async function LocaleLayout({ children, params }) {
   const { locale } = await params;
 
-  if (!locales.includes(locale)) notFound();
+  if (!LOCALES.includes(locale)) notFound();
+
+  // ✅ Must be called before any translations are used
+  setRequestLocale(locale);
 
   const messages = await getMessages();
   const isRtl = RTL_LOCALES.includes(locale);

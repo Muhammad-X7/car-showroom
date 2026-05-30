@@ -52,13 +52,22 @@ function formatCar(car, locale = "en") {
     gallery: galleryRaw.map(buildImageUrl),
     trim: a.Trim || null,
     transmission: a.Transmission || null,
-    fuelType: a.Fuel || a.FuelType || null,
-    location: a.Location || "Iraq",
+    fuelType: a.Fuel || null,
+    location: a.ImportCountry || "Iraq",   // ImportCountry is the real location field
     type: a.Type || null,
     description: a.Description || null,
     color: a.Color || null,
-    engineSize: a.EngineSize || null,
-    doors: a.Doors || null,
+    engineSize: a.EngineSize ? String(a.EngineSize) : null,
+    // ── fields that were missing from the return object ──────────────
+    cylinders: a.Cylinders ? String(a.Cylinders) : null,
+    condition: a.Condition || null,
+    paintParts: a.PaintParts || null,
+    importCountry: a.ImportCountry || null,
+    plate: a.Plate || null,
+    seatNumber: a.SeatNumber ? String(a.SeatNumber) : null,
+    seatMaterial: a.SeatMaterial || null,
+    // ── kept for forward-compat if added to schema later ─────────────
+    doors: a.Doors ? String(a.Doors) : null,
     phone: a.Phone || null,
     slug: a.slug || String(car.documentId || car.id),
   };

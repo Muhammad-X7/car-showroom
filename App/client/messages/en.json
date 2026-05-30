@@ -1,5 +1,6 @@
 {
   "phoneNumber": "0750 999 9999",
+  "Description": " Iraq's premier car listing platform. Find your perfect vehicle from thousands of listings across the country.",
   "searchPlaceholder": "Search by make or model…",
   "filterMake": "Make",
   "filterModel": "Model",
@@ -17,7 +18,6 @@
   "loadMore": "Load More",
   "noResults": "No cars found matching your search.",
   "loading": "Loading cars…",
-  "copyright": "© 2026 Cars. All rights reserved.",
   "freePlate": "Free Plate",
   "privateSeller": "Private Seller",
   "contactSeller": "Contact Seller",

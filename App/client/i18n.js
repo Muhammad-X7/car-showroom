@@ -1,17 +1,16 @@
 import { getRequestConfig } from "next-intl/server";
-import { notFound } from "next/navigation";
-
-export const locales = ["ar", "en", "ckb"];
-export const defaultLocale = "ar";
+import { routing } from "./src/i18n/routing";
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  // requestLocale is a Promise in next-intl v4
-  const locale = await requestLocale;
+    const locale = await requestLocale;
+    
+    // Fall back to defaultLocale instead of 404ing
+    const resolvedLocale = locale && routing.locales.includes(locale)
+        ? locale
+        : routing.defaultLocale;
 
-  if (!locale || !locales.includes(locale)) notFound();
-
-  return {
-    locale,
-    messages: (await import(`./messages/${locale}.json`)).default,
-  };
+    return {
+        locale: resolvedLocale,
+        messages: (await import(`./messages/${resolvedLocale}.json`)).default,
+    };
 });

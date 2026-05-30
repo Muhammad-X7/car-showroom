@@ -6,7 +6,7 @@ import Link from "next/link";
 const LANGS = [
     { code: "en", label: "EN", flag: "/US_flag.svg" },
     { code: "ar", label: "AR", flag: "/iraq_flag.jpg" },
-    { code: "ku", label: "KU", flag: "/Flag_of_Kurdistan.svg" },
+    { code: "ckb", label: "KU", flag: "/Flag_of_Kurdistan.svg" },
 ];
 
 const GlobeIcon = () => (

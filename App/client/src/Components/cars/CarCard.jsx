@@ -8,13 +8,13 @@ const TypeBadge = ({ type, t }) => {
     if (type === "freePlate") return (
         <span className="absolute top-3 left-3 bg-[var(--pink)] text-white
       text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
-            {t.freePlate}
+            {t("freePlate")}
         </span>
     );
     if (type === "privateSeller") return (
         <span className="absolute top-3 left-3 bg-[var(--green)] text-white
       text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
-            {t.privateSeller}
+            {t("privateSeller")}
         </span>
     );
     return null;
@@ -30,7 +30,7 @@ const PinIcon = () => (
 
 function getLocalizedMake(car, lang) {
     if (lang === "ar" && car.makeAr) return car.makeAr;
-    if (lang === "ku" && car.makeKu) return car.makeKu;
+    if (lang === "ckb" && car.makeKu) return car.makeKu;
     return car.make;
 }
 
@@ -41,7 +41,7 @@ export default function CarCard({ car, lang, index = 0, t }) {
 
     return (
         <Link
-            href={`/cars/${car.id}`}
+            href={`/${lang}/cars/${car.id}`}
             className="animate-card block bg-[var(--bg-card)] border border-[var(--border)]
         rounded-xl overflow-hidden shadow-[var(--shadow-sm)]
         hover:shadow-[var(--shadow-md)] hover:-translate-y-1

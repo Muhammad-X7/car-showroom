@@ -84,28 +84,29 @@ function Footer({ t }) {
                         <img src="/logo.png" alt="IQCars Logo" className="h-10 w-auto" />
                     </div>
                     <p className="text-[var(--text-muted)] text-sm leading-relaxed max-w-xs">
-                        Iraq's premier car listing platform. Find your perfect vehicle from
-                        thousands of listings across the country.
+                        {/* Iraq's premier car listing platform. Find your perfect vehicle from
+                        thousands of listings across the country. */}
+                        {t("Description")}
                     </p>
                 </div>
 
                 {/* Contact column */}
                 <div className="flex flex-col gap-3">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-muted)]">
-                        {t.information}
+                        {t("information")}
                     </h3>
-                    <a href={`tel:${t.phoneNumber.replace(/\s/g, "")}`}
+                    <a href={`tel:${t("phoneNumber").replace(/\s/g, "")}`}
                         className="flex items-center gap-2.5 text-[var(--text-muted)] hover:text-[var(--accent)]
               text-sm transition-colors">
-                        <PhoneIcon /> {t.phoneNumber}
+                        <PhoneIcon /> {t("phoneNumber")}
                     </a>
                     <div className="flex items-center gap-2.5 text-[var(--text-muted)] text-sm">
-                        <PinIcon /> {t.address}
+                        <PinIcon /> {t("address")}
                     </div>
-                    <a href={`mailto:${t.email}`}
+                    <a href={`mailto:${t("email")}`}
                         className="flex items-center gap-2.5 text-[var(--text-muted)] hover:text-[var(--accent)]
               text-sm transition-colors">
-                        <MailIcon /> {t.email}
+                        <MailIcon /> {t("email")}
                     </a>
                 </div>
 
@@ -116,7 +117,7 @@ function Footer({ t }) {
             <div className="border-t border-[var(--border)]">
                 <div className="max-w-6xl mx-auto px-6 md:px-10 py-5 flex flex-col sm:flex-row
           items-center justify-between gap-4">
-                    <p className="text-[var(--text-muted)] text-xs">{t.copyright}</p>
+                    <p className="text-[var(--text-muted)] text-xs">Copyright © 2026 Cars</p>
 
                     <div className="flex items-center gap-3">
                         {SOCIALS.map((s) => (
