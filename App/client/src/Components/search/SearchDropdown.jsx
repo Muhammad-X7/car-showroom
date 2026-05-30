@@ -4,7 +4,7 @@
 // Each consumer passes its own className for layout differences.
 
 import React, { useRef, useState, useEffect } from "react";
-import { ChevronDownIcon } from "./Icons";
+import { ChevronDownIcon } from "../layout/Icons";
 
 /**
  * @param {string}   label        — small label shown above the current value (desktop style)
@@ -37,7 +37,7 @@ export default function SearchDropdown({
     const desktopTrigger = (
         <button
             onClick={() => setOpen((v) => !v)}
-            className="w-full text-left px-4 py-3 flex flex-col gap-0.5"
+            className="w-full text-left px-4 py-3 flex flex-col gap-0.5 cursor-pointer"
             aria-haspopup="listbox"
             aria-expanded={open}
         >
@@ -58,7 +58,7 @@ export default function SearchDropdown({
             onClick={() => setOpen((v) => !v)}
             className="w-full flex items-center justify-between px-4 py-3 rounded-xl
         border border-[var(--border)] bg-[var(--bg-subtle)]
-        text-sm font-medium text-[var(--text)] transition-colors
+        text-sm font-medium text-[var(--text)] cursor-pointer transition-colors
         hover:border-[var(--accent)]"
             aria-haspopup="listbox"
             aria-expanded={open}
@@ -81,7 +81,7 @@ export default function SearchDropdown({
           min-w-[180px] max-h-52 overflow-y-auto">
                     <button
                         onClick={() => { onChange(""); setOpen(false); }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-[var(--text-muted)]
+                        className="w-full text-left px-4 py-2.5 text-sm cursor-pointer text-[var(--text-muted)]
               hover:bg-[var(--bg-subtle)] transition-colors"
                     >
                         {placeholder || label}
@@ -90,7 +90,7 @@ export default function SearchDropdown({
                         <button
                             key={opt}
                             onClick={() => { onChange(opt); setOpen(false); }}
-                            className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                            className={`w-full text-left px-4 py-2.5 text-sm cursor-pointer transition-colors
                 ${value === opt
                                     ? "text-[var(--accent)] bg-[var(--bg-subtle)] font-semibold"
                                     : "text-[var(--text)] hover:bg-[var(--bg-subtle)]"

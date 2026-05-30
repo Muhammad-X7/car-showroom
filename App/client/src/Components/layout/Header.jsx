@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 const LANGS = [
-    { code: "en", label: "EN", flag: "https://flagcdn.com/w40/us.jpg" },
-    { code: "ar", label: "AR", flag: "https://flagcdn.com/w40/iq.jpg" },
+    { code: "en", label: "EN", flag: "/US_flag.svg" },
+    { code: "ar", label: "AR", flag: "/iraq_flag.jpg" },
     { code: "ku", label: "KU", flag: "/Flag_of_Kurdistan.svg" },
 ];
 
@@ -61,7 +61,7 @@ function Header({ lang, setLang, t }) {
                 <div className="relative" data-lang-selector>
                     <button
                         onClick={() => setOpen((v) => !v)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold cursor-pointer
               text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-subtle)]
               transition-colors border border-[var(--border)]"
                         aria-label="Change language"
@@ -88,7 +88,7 @@ function Header({ lang, setLang, t }) {
                                     role="option"
                                     aria-selected={lang === l.code}
                                     onClick={() => { setLang(l.code); setOpen(false); }}
-                                    className={`lang-item w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold
+                                    className={`lang-item w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold cursor-pointer
                     ${lang === l.code
                                             ? "text-[var(--accent)] bg-[var(--bg-subtle)] active"
                                             : "text-[var(--text-muted)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text)]"

@@ -38,7 +38,7 @@ export default function MobileSearchBar({ onSearchOpen, totalCount }) {
                 onClick={onSearchOpen}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl
           border border-[var(--border)] bg-[var(--bg-subtle)]
-          text-sm text-[var(--text-muted)] transition-all
+          text-sm text-[var(--text-muted)] cursor-pointer transition-all
           hover:border-[var(--accent)] hover:text-[var(--text)]
           active:scale-[.98]"
                 aria-label="Open search filters"

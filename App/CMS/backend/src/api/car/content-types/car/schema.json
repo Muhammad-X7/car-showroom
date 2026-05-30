@@ -9,76 +9,54 @@
   "options": {
     "draftAndPublish": false
   },
-  "pluginOptions": {},
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
   "attributes": {
     "Name": {
-      "type": "string"
-    },
-    "Price": {
-      "type": "float"
-    },
-    "Image": {
-      "type": "media",
-      "multiple": true,
-      "allowedTypes": [
-        "images"
-      ]
-    },
-    "Year": {
-      "type": "integer"
-    },
-    "Brand": {
-      "type": "string"
-    },
-    "Kilometers": {
-      "type": "float"
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": true }
+      }
     },
     "Description": {
-      "type": "text"
+      "type": "text",
+      "pluginOptions": {
+        "i18n": { "localized": true }
+      }
+    },
+    "Brand": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": true }
+      }
     },
     "Trim": {
-      "type": "string"
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": true }
+      }
     },
-    "Condition": {
-      "type": "enumeration",
-      "enum": [
-        "New",
-        "Used"
-      ]
-    },
-    "PaintParts": {
-      "type": "string"
-    },
-    "Fuel": {
-      "type": "string"
-    },
-    "ImportCountry": {
-      "type": "string"
-    },
-    "Plate": {
-      "type": "string"
-    },
-    "EngineSize": {
-      "type": "float"
-    },
-    "Cylinders": {
-      "type": "integer"
-    },
+
+    "Price":       { "type": "float" },
+    "Image":       { "type": "media", "multiple": true, "allowedTypes": ["images"] },
+    "Year":        { "type": "integer" },
+    "Kilometers":  { "type": "float" },
+    "Condition":   { "type": "enumeration", "enum": ["New", "Used"] },
+    "PaintParts":  { "type": "string" },
+    "Fuel":        { "type": "string" },
+    "ImportCountry": { "type": "string" },
+    "Plate":       { "type": "string" },
+    "EngineSize":  { "type": "float" },
+    "Cylinders":   { "type": "integer" },
     "Transmission": {
       "type": "enumeration",
-      "enum": [
-        "Automatic",
-        "Manual"
-      ]
+      "enum": ["Automatic", "Manual"]
     },
-    "SeatNumber": {
-      "type": "integer"
-    },
-    "SeatMaterial": {
-      "type": "string"
-    },
-    "Color": {
-      "type": "string"
-    }
+    "SeatNumber":  { "type": "integer" },
+    "SeatMaterial": { "type": "string" },
+    "Color":       { "type": "string" }
   }
 }

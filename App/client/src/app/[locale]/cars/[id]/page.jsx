@@ -4,9 +4,9 @@
 import { useState, useEffect, useCallback, use, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Header from "../../../Components/Header";
-import Footer from "../../../Components/Footer";
-import Translations from "../..//Translations";
+import Header from "../../../../Components/layout/Header";
+import Footer from "../../../../Components/layout/Footer";
+import Translations from "../../../Translations";
 
 const STRAPI_BASE = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
@@ -185,13 +185,13 @@ function Gallery({ images, alt }) {
                         <button onClick={prev} aria-label="Previous photo"
                             className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
                                 bg-black/40 hover:bg-black/60 items-center justify-center
-                                text-white backdrop-blur-sm transition-colors">
+                                text-white backdrop-blur-sm cursor-pointer transition-colors">
                             <ChevronLeft />
                         </button>
                         <button onClick={next} aria-label="Next photo"
                             className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full
                                 bg-black/40 hover:bg-black/60 items-center justify-center
-                                text-white backdrop-blur-sm transition-colors">
+                                text-white backdrop-blur-sm cursor-pointer transition-colors">
                             <ChevronRight />
                         </button>
                     </>
@@ -212,7 +212,7 @@ function Gallery({ images, alt }) {
                             aria-selected={i === active}
                             aria-label={`Go to photo ${i + 1}`}
                             onClick={() => setActive(i)}
-                            className="relative h-[3px] flex-1 rounded-full overflow-hidden bg-[var(--border)]"
+                            className="relative h-[3px] flex-1 rounded-full overflow-hidden bg-[var(--border)] cursor-pointer"
                         >
                             <span
                                 className="absolute inset-y-0 left-0 rounded-full"
@@ -238,7 +238,7 @@ function Gallery({ images, alt }) {
                         <button
                             key={i}
                             onClick={() => setActive(i)}
-                            className={`shrink-0 rounded-lg overflow-hidden border-2 transition-all
+                            className={`shrink-0 rounded-lg overflow-hidden border-2 cursor-pointer transition-all
                                 ${i === active ? "border-[var(--accent)]" : "border-transparent opacity-60 hover:opacity-90"}`}
                             style={{ width: 88, height: 60 }}
                             aria-label={`Photo ${i + 1}`}

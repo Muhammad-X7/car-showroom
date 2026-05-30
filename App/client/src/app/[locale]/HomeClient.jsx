@@ -1,15 +1,15 @@
 "use client";
-// src/app/HomeClient.jsx
+// src/app/[locale]/HomeClient.jsx
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
-import CarCard from "../Components/CarCard";
-import MobileSearchBar from "../Components/MobileSearchBar";
-import CarCardSkeleton from "../Components/CarCardSkeleton";
-import FilterBar from "../Components/FilterBar";
-import SearchModal from "../Components/SearchModal";
-import Translations from "./Translations";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter, usePathname } from "next/navigation";
+import Header from "@/Components/layout/Header";
+import Footer from "@/Components/layout/Footer";
+import CarCard from "@/Components/cars/CarCard";
+import MobileSearchBar from "@/Components/search/MobileSearchBar";
+import FilterBar from "@/Components/search/FilterBar";
+import SearchModal from "@/Components/search/SearchModal";
 
 const PAGE_SIZE = 12;
 
@@ -18,14 +18,21 @@ function unique(arr) {
 }
 
 export default function HomeClient({ initialCars = [], initialError = null }) {
-    const [lang, setLang] = useState("en");
-    const t = Translations[lang];
-    const isRtl = lang === "ar" || lang === "ku";
+    const t = useTranslations();        // ← reads from next-intl context
+    const locale = useLocale();         // ← "ar" | "en" | "ckb" from URL
+    const router = useRouter();
+    const pathname = usePathname();
 
-    useEffect(() => {
-        document.documentElement.dir = isRtl ? "rtl" : "ltr";
-        document.documentElement.lang = lang;
-    }, [isRtl, lang]);
+    const isRtl = locale === "ar" || locale === "ckb";
+
+    // Language switcher: navigates to /[newLocale]/... instead of setting state
+    const setLang = useCallback((newLocale) => {
+        // Replace the locale segment in the current path
+        // e.g. /ar/cars/5 → /en/cars/5
+        const segments = pathname.split("/");
+        segments[1] = newLocale;
+        router.push(segments.join("/"));
+    }, [pathname, router]);
 
     const cars = initialCars;
     const error = initialError;
@@ -34,16 +41,23 @@ export default function HomeClient({ initialCars = [], initialError = null }) {
     const [make, setMake] = useState("");
     const [model, setModel] = useState("");
     const [year, setYear] = useState("");
+    const [city, setCity] = useState("");
+    const [mileage, setMileage] = useState("");
+    const [price, setPrice] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
+    const [minMileage, setMinMileage] = useState("");
+    const [maxMileage, setMaxMileage] = useState("");
     const [transmission, setTransmission] = useState("");
     const [fuelType, setFuelType] = useState("");
     const [page, setPage] = useState(1);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
 
     const onReset = useCallback(() => {
-        setSearchTerm(""); setMake(""); setModel(""); setYear("");
-        setMinPrice(""); setMaxPrice(""); setTransmission(""); setFuelType("");
+        setSearchTerm(""); setMake(""); setModel(""); setYear(""); setCity("");
+        setMileage(""); setPrice("");
+        setMinPrice(""); setMaxPrice(""); setMinMileage(""); setMaxMileage("");
+        setTransmission(""); setFuelType("");
         setPage(1);
     }, []);
 
@@ -74,7 +88,10 @@ export default function HomeClient({ initialCars = [], initialError = null }) {
     const visible = useMemo(() => filtered.slice(0, page * PAGE_SIZE), [filtered, page]);
     const hasMore = visible.length < filtered.length;
 
-    useEffect(() => setPage(1), [searchTerm, make, model, year, minPrice, maxPrice, transmission, fuelType]);
+    useEffect(() => setPage(1), [
+        searchTerm, make, model, year, city, mileage, price,
+        minPrice, maxPrice, transmission, fuelType
+    ]);
 
     return (
         <div
@@ -82,36 +99,45 @@ export default function HomeClient({ initialCars = [], initialError = null }) {
             className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-300"
         >
             <div className="max-w-6xl mx-auto w-full min-h-screen flex flex-col bg-[var(--bg)] border-x border-[var(--border)]">
-                <Header lang={lang} setLang={setLang} t={t} onSearchOpen={() => setSearchModalOpen(true)} />
+                <Header
+                    lang={locale}
+                    setLang={setLang}      // ← now navigates instead of setting state
+                    t={t}
+                    onSearchOpen={() => setSearchModalOpen(true)}
+                />
+
                 <MobileSearchBar
                     onSearchOpen={() => setSearchModalOpen(true)}
                     totalCount={filtered.length}
                 />
+
                 <SearchModal
                     open={searchModalOpen} onClose={() => setSearchModalOpen(false)}
                     make={make} setMake={setMake}
                     model={model} setModel={setModel}
                     year={year} setYear={setYear}
+                    city={city} setCity={setCity}
                     minPrice={minPrice} setMinPrice={setMinPrice}
                     maxPrice={maxPrice} setMaxPrice={setMaxPrice}
+                    minMileage={minMileage} setMinMileage={setMinMileage}
+                    maxMileage={maxMileage} setMaxMileage={setMaxMileage}
                     transmission={transmission} setTransmission={setTransmission}
                     fuelType={fuelType} setFuelType={setFuelType}
-                    models={models} years={years} transmissions={transmissions} fuelTypes={fuelTypes}
+                    models={models} years={years}
+                    transmissions={transmissions} fuelTypes={fuelTypes}
                     totalCount={filtered.length} t={t}
                 />
 
                 <main className="px-6 md:px-10 py-8 flex-1 flex flex-col">
                     <FilterBar
-                        t={t} searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+                        t={t}
                         make={make} setMake={setMake}
                         model={model} setModel={setModel}
                         year={year} setYear={setYear}
-                        minPrice={minPrice} setMinPrice={setMinPrice}
-                        maxPrice={maxPrice} setMaxPrice={setMaxPrice}
-                        transmission={transmission} setTransmission={setTransmission}
-                        fuelType={fuelType} setFuelType={setFuelType}
-                        makes={makes} models={models} years={years}
-                        transmissions={transmissions} fuelTypes={fuelTypes}
+                        city={city} setCity={setCity}
+                        mileage={mileage} setMileage={setMileage}
+                        price={price} setPrice={setPrice}
+                        models={models} years={years}
                         onReset={onReset} totalCount={filtered.length}
                     />
 
@@ -123,7 +149,7 @@ export default function HomeClient({ initialCars = [], initialError = null }) {
 
                     {!error && filtered.length === 0 && (
                         <div className="flex flex-1 items-center justify-center text-[var(--text-muted)] text-sm">
-                            {t.noResults}
+                            {t("noResults")}
                         </div>
                     )}
 
@@ -131,17 +157,17 @@ export default function HomeClient({ initialCars = [], initialError = null }) {
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {visible.map((car, i) => (
-                                    <CarCard key={car.id} car={car} lang={lang} index={i} t={t} />
+                                    <CarCard key={car.id} car={car} lang={locale} index={i} t={t} />
                                 ))}
                             </div>
                             {hasMore && (
                                 <div className="flex justify-center mt-8">
                                     <button
                                         onClick={() => setPage((p) => p + 1)}
-                                        className="px-8 py-3 rounded-xl font-bold text-sm text-white hover:opacity-90 active:scale-[.98] transition-all"
+                                        className="px-8 py-3 rounded-xl font-bold text-sm text-white hover:opacity-90 active:scale-[.98] cursor-pointer transition-all"
                                         style={{ background: "var(--accent)" }}
                                     >
-                                        {t.loadMore}
+                                        {t("loadMore")}
                                     </button>
                                 </div>
                             )}

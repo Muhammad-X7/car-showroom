@@ -4,7 +4,7 @@
 
 import React, { useRef, useEffect } from "react";
 import { BRANDS, IRAQ_CITIES, MILEAGE_OPTIONS, PRICE_OPTIONS } from "./searchConstants";
-import { SearchIcon, XIcon } from "./Icons";
+import { SearchIcon, XIcon } from "../layout/Icons";
 import SearchDropdown from "./SearchDropdown";
 
 /* ── SearchModal ─────────────────────────────────────────────────── */
@@ -61,7 +61,7 @@ export default function SearchModal({
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text)]
-              hover:bg-[var(--bg-subtle)] transition-colors"
+              hover:bg-[var(--bg-subtle)] cursor-pointer transition-colors"
             aria-label="Close search"
           >
             <XIcon />
@@ -92,7 +92,7 @@ export default function SearchModal({
                 onClick={() => setMake(make === brand.name ? "" : brand.name)}
                 title={brand.name}
                 className={`h-[56px] rounded-xl border-2 transition-all duration-200
-                  flex items-center justify-center p-2 bg-[#aba9a9c3]
+                  flex items-center justify-center p-2 bg-[#aba9a9c3] cursor-pointer
                   hover:border-[var(--accent)]
                   ${make === brand.name
                     ? "border-[var(--accent)] bg-[var(--bg-subtle)]"
@@ -180,7 +180,7 @@ export default function SearchModal({
           <button
             onClick={onClose}
             className="w-full flex items-center justify-center gap-2 py-4 rounded-xl
-              font-bold text-base text-white hover:opacity-90 active:scale-[.98] transition-all"
+              font-bold text-base text-white cursor-pointer hover:opacity-90 active:scale-[.98] transition-all"
             style={{ background: "var(--accent)" }}
           >
             <SearchIcon />

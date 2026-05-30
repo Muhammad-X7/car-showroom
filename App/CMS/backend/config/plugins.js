@@ -1,9 +1,16 @@
 module.exports = ({ env }) => ({
+  i18n: {
+    enabled: true,
+    config: {
+      defaultLocale: 'en',
+      locales: ['en', 'ar', 'ckb'],
+    },
+  },
   upload: {
     config: {
       provider: 'aws-s3',
       providerOptions: {
-        baseUrl: env('AWS_BASE_URL'), // <-- This tells Strapi to use your public link
+        baseUrl: env('AWS_BASE_URL'),
         s3Options: {
           credentials: {
             accessKeyId: env('AWS_ACCESS_KEY_ID'),
