@@ -515,3 +515,11 @@ I want you to search for the latest versions of "next": "^16.2.6",
 "react": "19.2.4", 
 "react-dom": "19.2.4"
 In order to give better results
+
+
+
+I want you to write me a comment  git add .
+
+git commit -m ""
+
+git push origin main

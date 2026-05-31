@@ -28,29 +28,110 @@
       }
     },
     "Brand": {
-      "type": "string"
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
     },
     "Trim": {
-      "type": "string"
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
     },
-
-    "Price":       { "type": "float" },
-    "Image":       { "type": "media", "multiple": true, "allowedTypes": ["images"] },
-    "Year":        { "type": "integer" },
-    "Kilometers":  { "type": "float" },
-    "Condition":   { "type": "enumeration", "enum": ["New", "Used"] },
-    "PaintParts":  { "type": "string" },
-    "Fuel":        { "type": "string" },
-    "ImportCountry": { "type": "string" },
-    "Plate":       { "type": "string" },
-    "EngineSize":  { "type": "float" },
-    "Cylinders":   { "type": "integer" },
+    "Price": {
+      "type": "float",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Image": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"],
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Year": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Kilometers": {
+      "type": "float",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Condition": {
+      "type": "enumeration",
+      "enum": ["New", "Used"],
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "PaintParts": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Fuel": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "ImportCountry": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Plate": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "EngineSize": {
+      "type": "float",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Cylinders": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
     "Transmission": {
       "type": "enumeration",
-      "enum": ["Automatic", "Manual"]
+      "enum": ["Automatic", "Manual"],
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
     },
-    "SeatNumber":  { "type": "integer" },
-    "SeatMaterial": { "type": "string" },
-    "Color":       { "type": "string" }
+    "SeatNumber": {
+      "type": "integer",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "SeatMaterial": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    },
+    "Color": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": { "localized": false }
+      }
+    }
   }
 }
